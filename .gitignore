@@ -1,0 +1,6 @@
+node_modules/
+.env
+*.log
+android/app/build/
+android/.gradle/
+siraje_data.json

@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIRAJE STORE — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f1a;--s1:#121827;--s2:#182034;--border:#1f2d4a;
+  --text:#dde3f2;--text2:#6b7fa3;
+  --gold:#c8952a;--gold-lt:#e8b84b;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
+  --iam:#009BDE;--inwi:#8b2fc9;--orange:#FF6600;
+  --side:248px;--r:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;overflow-x:hidden}
+
+/* ── SIDEBAR ──────────────────────────────────────────────────── */
+.side{width:var(--side);min-height:100vh;background:var(--s1);border-right:1px solid var(--border);position:fixed;top:0;left:0;z-index:100;display:flex;flex-direction:column;}
+.slogo{padding:20px;border-bottom:1px solid var(--border);}
+.slogo .name{font-size:1rem;font-weight:700;color:var(--gold-lt);}
+.slogo .sub{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.15em;margin-top:3px;}
+.snav{flex:1;padding:8px 0;overflow-y:auto;}
+.snav-sect{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--text2);padding:12px 18px 4px;opacity:.5;}
+.sitem{display:flex;align-items:center;gap:10px;padding:9px 18px;color:var(--text2);cursor:pointer;font-size:.82rem;font-weight:500;transition:.15s;border-left:2px solid transparent;margin:1px 0;}
+.sitem:hover{color:var(--text);background:rgba(255,255,255,.02);}
+.sitem.active{color:var(--gold-lt);background:rgba(200,149,42,.07);border-left-color:var(--gold);}
+.sitem .si{width:18px;text-align:center;font-size:.95rem;}
+.sitem .badge-n{margin-left:auto;background:var(--red);color:#fff;font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:700;}
+.sfooter{padding:14px 18px;border-top:1px solid var(--border);font-size:.7rem;color:var(--text2);display:flex;align-items:center;gap:8px;}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.site-link{display:flex;align-items:center;gap:6px;padding:8px 14px;margin:8px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);font-size:.75rem;font-weight:600;text-decoration:none;transition:.15s;}
+.site-link:hover{border-color:var(--gold);color:var(--gold-lt);}
+
+/* ── MAIN ─────────────────────────────────────────────────────── */
+.main{margin-left:var(--side);flex:1;display:flex;flex-direction:column;}
+.topbar{background:var(--s1);border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.tb-left{display:flex;align-items:center;gap:10px;}
+.tb-title{font-size:1rem;font-weight:600;}
+.tb-date{font-size:.72rem;color:var(--text2);}
+.tb-right{display:flex;gap:8px;}
+
+/* ── PAGES ────────────────────────────────────────────────────── */
+.page{display:none;padding:22px 24px;animation:fi .2s ease;}
+.page.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.ph{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:18px;}
+.ph h2{font-size:1.2rem;font-weight:600;}
+.ph p{font-size:.78rem;color:var(--text2);margin-top:3px;}
+
+/* ── STATS GRID ───────────────────────────────────────────────── */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:20px;}
+.sc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;position:relative;overflow:hidden;transition:.2s;}
+.sc:hover{border-color:rgba(200,149,42,.3);transform:translateY(-2px);}
+.sc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),var(--gold-lt));}
+.sc.g::after{background:linear-gradient(90deg,var(--green),#16a34a);}
+.sc.b::after{background:linear-gradient(90deg,var(--blue),#1d4ed8);}
+.sc.r::after{background:linear-gradient(90deg,var(--red),#b91c1c);}
+.sc.p::after{background:linear-gradient(90deg,var(--purple),#7c3aed);}
+.sc-ico{font-size:1.3rem;margin-bottom:8px;}
+.sc-val{font-size:1.5rem;font-weight:700;font-family:'JetBrains Mono',monospace;line-height:1.1;}
+.sc-lbl{font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-top:4px;}
+
+/* ── TABLE ────────────────────────────────────────────────────── */
+.tw{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead tr{background:rgba(255,255,255,.02);}
+th{padding:9px 12px;text-align:left;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--text2);border-bottom:1px solid var(--border);}
+td{padding:10px 12px;font-size:.82rem;border-bottom:1px solid rgba(31,45,74,.6);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(255,255,255,.015);}
+.mono{font-family:'JetBrains Mono',monospace;font-size:.78rem;}
+
+/* ── BADGES ───────────────────────────────────────────────────── */
+.bdg{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600;}
+.bdg-g{background:rgba(34,197,94,.1);color:var(--green);}
+.bdg-r{background:rgba(239,68,68,.1);color:var(--red);}
+.bdg-y{background:rgba(234,179,8,.1);color:#ca8a04;}
+.bdg-b{background:rgba(59,130,246,.1);color:var(--blue);}
+.bdg-p{background:rgba(168,85,247,.1);color:var(--purple);}
+.bdg-n{background:rgba(107,127,163,.1);color:var(--text2);}
+.bdg-iam{background:rgba(0,155,222,.15);color:var(--iam);}
+.bdg-inwi{background:rgba(139,47,201,.15);color:var(--inwi);}
+.bdg-orange{background:rgba(255,102,0,.15);color:var(--orange);}
+
+/* ── BTNS ─────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border:none;border-radius:8px;font-family:'Sora',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;transition:.15s;white-space:nowrap;}
+.btn-gold{background:var(--gold);color:#000;}
+.btn-gold:hover{background:var(--gold-lt);transform:translateY(-1px);}
+.btn-ghost{background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:var(--text);}
+.btn-g{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3);}
+.btn-g:hover{background:rgba(34,197,94,.25);}
+.btn-r{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3);}
+.btn-r:hover{background:rgba(239,68,68,.2);}
+.btn-b{background:rgba(59,130,246,.12);color:var(--blue);border:1px solid rgba(59,130,246,.3);}
+.btn-sm{padding:4px 9px;font-size:.72rem;}
+.btn-block{width:100%;justify-content:center;padding:11px;}
+
+/* ── SEARCH / FILTER ──────────────────────────────────────────── */
+.sbar{display:flex;gap:10px;margin-bottom:14px;align-items:center;flex-wrap:wrap;}
+.sinp{padding:8px 12px 8px 32px;background:var(--s1);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:.82rem;outline:none;transition:.15s;position:relative;}
+.sinp:focus{border-color:var(--gold);}
+.sinp-wrap{position:relative;}
+.sinp-wrap .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.85rem;color:var(--text2);}
+select.filter-sel{padding:8px 10px;background:var(--s1);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Sora',sans-serif;font-size:.82rem;outline:none;cursor:pointer;}
+select.filter-sel option{background:var(--bg);}
+
+/* ── MODAL ────────────────────────────────────────────────────── */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.2s;}
+.ov.open{opacity:1;pointer-events:all;}
+.md{background:var(--s2);border:1px solid var(--border);border-radius:16px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:scale(.95) translateY(8px);transition:.2s;box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.ov.open .md{transform:none;}
+.mh{padding:18px 22px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.mh h3{font-size:.95rem;font-weight:600;}
+.mx{background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer;padding:3px;border-radius:5px;line-height:1;}
+.mx:hover{color:var(--red);}
+.mb{padding:18px 22px;}
+.mf{padding:12px 22px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.full{grid-column:1/-1;}
+label{font-size:.68rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;}
+input,select,textarea{padding:8px 11px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Sora',sans-serif;font-size:.85rem;outline:none;transition:.15s;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);}
+select option{background:var(--bg);}
+textarea{resize:vertical;min-height:60px;}
+
+/* ── CHARTS ───────────────────────────────────────────────────── */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;}
+.cc{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.cc h3{font-size:.8rem;font-weight:600;color:var(--text2);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em;}
+.br-list{display:flex;flex-direction:column;gap:9px;}
+.br{display:flex;align-items:center;gap:9px;font-size:.77rem;}
+.br-l{flex:0 0 120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text2);}
+.br-t{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.br-f{height:100%;border-radius:3px;transition:width .5s ease;}
+.br-v{flex:0 0 60px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--text2);}
+
+/* ── TABS ─────────────────────────────────────────────────────── */
+.tabs{display:flex;gap:0;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:16px;width:fit-content;border:1px solid var(--border);}
+.tab{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--text2);transition:.15s;}
+.tab.active{background:var(--gold);color:#000;}
+.tab:hover:not(.active){color:var(--text);}
+
+/* ── COMMANDE DETAIL ──────────────────────────────────────────── */
+.cmd-items{background:var(--bg);border-radius:8px;padding:12px;margin-top:10px;}
+.cmd-item{display:flex;justify-content:space-between;font-size:.8rem;padding:5px 0;border-bottom:1px solid var(--border);}
+.cmd-item:last-child{border-bottom:none;}
+.cmd-total{display:flex;justify-content:space-between;font-weight:700;padding-top:8px;margin-top:4px;border-top:1px solid var(--border);}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.info-cell{background:var(--bg);border-radius:7px;padding:10px 12px;}
+.info-cell .lbl{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px;}
+.info-cell .val{font-size:.82rem;font-weight:600;}
+
+/* ── ALERTE STOCK ─────────────────────────────────────────────── */
+.stock-alert-list{display:flex;flex-direction:column;gap:6px;}
+.sal-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:8px;font-size:.8rem;}
+.sal-name{flex:1;font-weight:600;}
+.sal-stock{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--red);}
+
+/* ── OP CAISSE ────────────────────────────────────────────────── */
+.op-row{display:flex;gap:8px;margin-bottom:12px;}
+.op-b{flex:1;padding:10px;border-radius:9px;border:2px solid var(--border);background:transparent;cursor:pointer;font-family:'Sora',sans-serif;font-size:.82rem;font-weight:700;color:var(--text2);transition:.15s;text-align:center;}
+.op-b.iam.a{border-color:var(--iam);background:rgba(0,155,222,.1);color:var(--iam);}
+.op-b.inwi.a{border-color:var(--inwi);background:rgba(139,47,201,.1);color:var(--inwi);}
+.op-b.orange.a{border-color:var(--orange);background:rgba(255,102,0,.1);color:var(--orange);}
+.montants-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+.mont-b{padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-weight:700;cursor:pointer;font-size:.9rem;transition:.15s;}
+.mont-b:hover{border-color:var(--gold);color:var(--gold-lt);}
+.mont-b.sel{border-color:var(--gold);background:rgba(200,149,42,.1);color:var(--gold-lt);}
+
+/* ── TARIF PHOTO CAISSE ───────────────────────────────────────── */
+.tarif-row{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.tarif-b{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:.15s;}
+.tarif-b:hover{border-color:var(--gold);}
+.tarif-b.sel{border-color:var(--gold);background:rgba(200,149,42,.06);}
+.tarif-b .tn{font-size:.82rem;font-weight:600;}
+.tarif-b .tp{font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--gold-lt);}
+
+/* ── TOAST ────────────────────────────────────────────────────── */
+.toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:9px;padding:10px 16px;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(60px);opacity:0;transition:.25s;min-width:200px;}
+.toast.show{transform:none;opacity:1;}
+.toast.ok{border-left-color:var(--green);}
+.toast.err{border-left-color:var(--red);}
+
+/* ── EMPTY ────────────────────────────────────────────────────── */
+.empty{text-align:center;padding:40px 20px;color:var(--text2);}
+.empty .ei{font-size:2.2rem;margin-bottom:8px;opacity:.3;}
+</style>
+</head>
+<body>
+
+<!-- ════ SIDEBAR ══════════════════════════════════════════════════════ -->
+<aside class="side">
+  <div class="slogo">
+    <div class="name">⚙️ SIRAJE STORE</div>
+    <div class="sub">Panneau d'administration</div>
+  </div>
+  <nav class="snav">
+    <div class="snav-sect">Vue générale</div>
+    <div class="sitem active" onclick="nav(this,'dashboard')"><span class="si">📊</span> Dashboard</div>
+    <div class="snav-sect">Demandes clients</div>
+    <div class="sitem" onclick="nav(this,'commandes')"><span class="si">🛍️</span> Commandes <span class="badge-n" id="nb-cmd">0</span></div>
+    <div class="sitem" onclick="nav(this,'recharges-srv')"><span class="si">📶</span> Recharges <span class="badge-n" id="nb-rch">0</span></div>
+    <div class="sitem" onclick="nav(this,'photos-srv')"><span class="si">🖨️</span> Photocopies <span class="badge-n" id="nb-pht">0</span></div>
+    <div class="snav-sect">Caisse directe</div>
+    <div class="sitem" onclick="nav(this,'caisse-recharge')"><span class="si">💳</span> Vendre recharge</div>
+    <div class="sitem" onclick="nav(this,'caisse-photo')"><span class="si">📠</span> Vendre photocopie</div>
+    <div class="snav-sect">Gestion</div>
+    <div class="sitem" onclick="nav(this,'stock')"><span class="si">📚</span> Stock livres</div>
+    <div class="sitem" onclick="nav(this,'fournitures')"><span class="si">🎒</span> Fournitures <span class="badge-n" id="nb-fourn">0</span></div>
+    <div class="sitem" onclick="nav(this,'tarifs')"><span class="si">🏷️</span> Tarifs photocopie</div>
+    <div class="sitem" onclick="nav(this,'clients')"><span class="si">👥</span> Clients</div>
+    <div class="sitem" onclick="nav(this,'historique')"><span class="si">🕒</span> Historique</div>
+  </nav>
+  <a href="/" class="site-link">🌐 Voir le site client</a>
+  <div class="sfooter"><div class="dot"></div> Serveur actif · :3000</div>
+</aside>
+
+<!-- ════ MAIN ══════════════════════════════════════════════════════════ -->
+<main class="main">
+  <header class="topbar">
+    <div class="tb-left">
+      <div class="tb-title" id="page-title">Dashboard</div>
+      <div class="tb-date" id="tb-date"></div>
+    </div>
+    <div class="tb-right">
+      <button class="btn btn-ghost btn-sm" onclick="refreshPage()">🔄</button>
+    </div>
+  </header>
+
+  <!-- ══ DASHBOARD ════════════════════════════════════════════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="sg">
+      <div class="sc"><div class="sc-ico">💰</div><div class="sc-val" id="d-camois">—</div><div class="sc-lbl">CA total ce mois</div></div>
+      <div class="sc g"><div class="sc-ico">📅</div><div class="sc-val" id="d-cajour">—</div><div class="sc-lbl">CA aujourd'hui</div></div>
+      <div class="sc b"><div class="sc-ico">🛍️</div><div class="sc-val" id="d-cmd">—</div><div class="sc-lbl">Commandes en attente</div></div>
+      <div class="sc"><div class="sc-ico">📶</div><div class="sc-val" id="d-rch">—</div><div class="sc-lbl">Recharges en attente</div></div>
+      <div class="sc"><div class="sc-ico">🖨️</div><div class="sc-val" id="d-pht">—</div><div class="sc-lbl">Photocopies en attente</div></div>
+      <div class="sc r"><div class="sc-ico">⚠️</div><div class="sc-val" id="d-alerte">—</div><div class="sc-lbl">Articles stock bas</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+      <div class="cc"><h3>📈 CA 7 jours</h3><div class="br-list" id="d-ca7j"></div></div>
+      <div class="cc"><h3>🏆 Top livres ce mois</h3><div id="d-top"></div></div>
+      <div class="cc">
+        <h3>📶 Recharges par opérateur</h3>
+        <div id="d-op"></div>
+        <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+          <h3 style="margin-bottom:10px">⚠️ Stock critique</h3>
+          <div class="stock-alert-list" id="d-stock-alert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COMMANDES ════════════════════════════════════════════════ -->
+  <div class="page" id="page-commandes">
+    <div class="ph"><div><h2>Commandes clients</h2><p>Gérez les commandes de livres passées en ligne</p></div></div>
+    <div class="sbar">
+      <select class="filter-sel" id="cmd-filtre" onchange="loadCommandes()">
+        <option value="">Toutes</option>
+        <option value="nouvelle">🟡 Nouvelles</option>
+        <option value="confirmee">✅ Confirmées</option>
+        <option value="prete">📦 Prêtes</option>
+        <option value="livree">🎁 Livrées</option>
+        <option value="annulee">❌ Annulées</option>
+      </select>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>N° Commande</th><th>Client</th><th>Téléphone</th><th>Statut</th><th>Total</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="cmd-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ RECHARGES SERVICE ═════════════════════════════════════════ -->
+  <div class="page" id="page-recharges-srv">
+    <div class="ph"><div><h2>Demandes de Recharges</h2><p>Recharges commandées en ligne par les clients</p></div></div>
+    <div class="sbar">
+      <select class="filter-sel" id="rch-filtre" onchange="loadRechargesSrv()">
+        <option value="en_attente">⏳ En attente</option>
+        <option value="traitee">✅ Traitées</option>
+        <option value="annulee">❌ Annulées</option>
+        <option value="">Toutes</option>
+      </select>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Client</th><th>Téléphone</th><th>Opérateur</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody id="rch-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ PHOTOCOPIES SERVICE ════════════════════════════════════════ -->
+  <div class="page" id="page-photos-srv">
+    <div class="ph"><div><h2>Demandes Photocopie</h2><p>Demandes soumises en ligne</p></div></div>
+    <div class="sbar">
+      <select class="filter-sel" id="pht-filtre" onchange="loadPhotosSrv()">
+        <option value="en_attente">⏳ En attente</option>
+        <option value="traitee">✅ Traitées</option>
+        <option value="">Toutes</option>
+      </select>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Client</th><th>Téléphone</th><th>Prestation</th><th>Pages</th><th>Total</th><th>Notes</th><th>Statut</th><th>Actions</th></tr></thead>
+        <tbody id="pht-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ CAISSE RECHARGE ═══════════════════════════════════════════ -->
+  <div class="page" id="page-caisse-recharge">
+    <div class="ph"><div><h2>Vente Recharge — Caisse</h2><p>Vente directe en magasin</p></div></div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px">
+        <div class="op-row">
+          <button class="op-b iam a" onclick="selOp('IAM',this)">🔵 IAM</button>
+          <button class="op-b inwi" onclick="selOp('Inwi',this)">🟣 inwi</button>
+          <button class="op-b orange" onclick="selOp('Orange',this)">🟠 Orange</button>
+        </div>
+        <div class="montants-row" id="crs-montants"></div>
+        <div class="fg"><label>Téléphone client (optionnel)</label><input id="crs-tel" placeholder="+212…"></div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px">
+        <div style="font-size:.8rem;font-weight:600;margin-bottom:12px;color:var(--text2)">Résumé</div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px;color:var(--text2)"><span>Opérateur</span><strong id="crs-r-op" style="color:var(--text)">—</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px;color:var(--text2)"><span>Montant</span><strong id="crs-r-mt" style="color:var(--text)">—</strong></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;padding-top:8px;border-top:1px solid var(--border)"><span>Total</span><span id="crs-r-total" style="color:var(--gold-lt);font-family:'JetBrains Mono',monospace">—</span></div>
+        </div>
+        <button class="btn btn-gold btn-block" onclick="vendireCaisseRecharge()">✅ Enregistrer la vente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CAISSE PHOTO ═══════════════════════════════════════════════ -->
+  <div class="page" id="page-caisse-photo">
+    <div class="ph"><div><h2>Vente Photocopie — Caisse</h2><p>Vente directe en magasin</p></div></div>
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:18px;align-items:start">
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px">
+        <div style="font-size:.8rem;font-weight:600;margin-bottom:10px;color:var(--text2)">Prestation</div>
+        <div class="tarif-row" id="cp-tarifs"></div>
+        <div class="fg"><label>Nombre de pages</label><input type="number" id="cp-pages" value="1" min="1" oninput="calcCaissePhoto()"></div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px">
+        <div style="font-size:.8rem;font-weight:600;margin-bottom:12px;color:var(--text2)">Résumé</div>
+        <div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px;color:var(--text2)"><span>Prestation</span><strong id="cp-r-nom" style="color:var(--text)">—</strong></div>
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px;color:var(--text2)"><span>Pages</span><strong id="cp-r-qty" style="color:var(--text)">—</strong></div>
+          <div style="display:flex;justify-content:space-between;font-weight:700;padding-top:8px;border-top:1px solid var(--border)"><span>Total</span><span id="cp-r-total" style="color:var(--gold-lt);font-family:'JetBrains Mono',monospace">—</span></div>
+        </div>
+        <button class="btn btn-gold btn-block" onclick="vendreCaissePhoto()">✅ Enregistrer la vente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ STOCK ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-stock">
+    <div class="ph">
+      <div><h2>Stock des Livres</h2><p>Catalogue complet et gestion du stock</p></div>
+      <button class="btn btn-gold" onclick="openProduitModal()">＋ Nouveau livre</button>
+    </div>
+    <div class="sbar">
+      <div class="sinp-wrap"><span class="ico">🔍</span><input class="sinp" style="padding-left:30px" id="stk-search" placeholder="Rechercher…" oninput="loadStock()"></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>Titre</th><th>Matière</th><th>Niveau</th><th>P. achat</th><th>P. vente</th><th>Marge</th><th>Stock</th><th>Visible</th><th>Actions</th></tr></thead>
+        <tbody id="stk-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ FOURNITURES ═══════════════════════════════════════════════════ -->
+  <div class="page" id="page-fournitures">
+    <div class="ph">
+      <div><h2>Fournitures scolaires</h2><p>Importez une liste PDF ou ajoutez manuellement — gestion de stock interne</p></div>
+      <button class="btn btn-gold" onclick="openProduitModal('fourniture')">＋ Ajouter manuellement</button>
+    </div>
+
+    <!-- Signalements : articles demandés par des clients, à publier/tarifer ou créer -->
+    <div class="cc" id="fourn-signal-wrap" style="display:none;margin-bottom:18px;border:1px solid rgba(200,149,42,.35)">
+      <h3>🔔 Articles demandés par des clients <span class="badge-n" id="fourn-signal-count" style="position:static;margin-left:6px">0</span></h3>
+      <p style="color:var(--text2);font-size:.85rem;margin:6px 0 14px">Des clients ont importé une liste de fournitures contenant ces articles. Certains existent déjà dans votre stock mais ne sont pas encore publiés (prix/visibilité) ; d'autres sont totalement inconnus.</p>
+      <div class="tw">
+        <table>
+          <thead><tr><th>Article demandé</th><th>Qté demandée</th><th>Demandé</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="fourn-signal-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Import PDF -->
+    <div class="cc" style="margin-bottom:18px">
+      <h3>📄 Importer une liste PDF</h3>
+      <p style="color:var(--text2);font-size:.85rem;margin:6px 0 14px">Déposez la liste de fournitures fournie par l'école (une fourniture par ligne, avec ou sans quantité). Vous pourrez relire et corriger chaque ligne avant de l'ajouter au stock.</p>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <input type="file" id="fourn-pdf-input" accept="application/pdf" style="max-width:320px">
+        <button class="btn btn-b" id="fourn-analyser-btn" onclick="analyserPdfFournitures()">🔍 Analyser le PDF</button>
+        <span id="fourn-pdf-status" style="font-size:.82rem;color:var(--text2)"></span>
+      </div>
+
+      <div id="fourn-preview-wrap" style="display:none;margin-top:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong style="font-size:.88rem">Articles détectés — relisez et corrigez avant import</strong>
+          <label style="display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--text2);font-weight:500;text-transform:none">
+            <input type="checkbox" id="fourn-check-all" checked onchange="toggleAllFourn(this.checked)" style="width:auto;accent-color:var(--gold)"> Tout sélectionner
+          </label>
+        </div>
+        <div class="tw">
+          <table>
+            <thead><tr><th style="width:32px"></th><th>Article</th><th style="width:110px">Quantité</th><th style="width:130px">Prix vente (DH)</th></tr></thead>
+            <tbody id="fourn-preview-tbody"></tbody>
+          </table>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px">
+          <button class="btn btn-gold" onclick="importerFournitures()">✅ Ajouter au stock</button>
+          <button class="btn btn-ghost" onclick="annulerPreviewFourn()">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stock fournitures existant -->
+    <div class="sbar">
+      <div class="sinp-wrap"><span class="ico">🔍</span><input class="sinp" style="padding-left:30px" id="fourn-search" placeholder="Rechercher une fourniture…" oninput="loadFournitures()"></div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th></th><th>Article</th><th>Prix vente</th><th>Stock</th><th>Visible</th><th>Actions</th></tr></thead>
+        <tbody id="fourn-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ TARIFS ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-tarifs">
+    <div class="ph">
+      <div><h2>Tarifs Photocopie</h2><p>Modifiez les prix en temps réel</p></div>
+      <button class="btn btn-gold" onclick="openTarifModal()">＋ Ajouter un tarif</button>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Prestation</th><th>Description</th><th>Prix / unité</th><th>Actif</th><th>Actions</th></tr></thead>
+        <tbody id="tar-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ CLIENTS ══════════════════════════════════════════════════════ -->
+  <div class="page" id="page-clients">
+    <div class="ph"><div><h2>Clients</h2><p>Base clients enregistrés</p></div></div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th><th>Commandes</th><th>Total achats</th><th>Depuis</th></tr></thead>
+        <tbody id="cli-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══ HISTORIQUE ════════════════════════════════════════════════ -->
+  <div class="page" id="page-historique">
+    <div class="ph"><div><h2>Historique des Ventes</h2><p>Journal de caisse (ventes directes traitées)</p></div></div>
+    <div class="sbar">
+      <input type="date" id="hist-debut" onchange="loadHistorique()" style="padding:7px 10px;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Sora',sans-serif;font-size:.8rem;">
+      <input type="date" id="hist-fin" onchange="loadHistorique()" style="padding:7px 10px;background:var(--s1);border:1px solid var(--border);border-radius:7px;color:var(--text);font-family:'Sora',sans-serif;font-size:.8rem;">
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Qté</th><th>P.U</th><th>Total</th></tr></thead>
+        <tbody id="hist-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<!-- ════ MODAL PRODUIT ════════════════════════════════════════════════ -->
+<div class="ov" id="ov-produit">
+  <div class="md">
+    <div class="mh"><h3 id="mp-title">Nouveau livre</h3><button class="mx" onclick="closeModal('produit')">✕</button></div>
+    <div class="mb">
+      <input type="hidden" id="mp-categorie" value="livre">
+      <div class="fgrid">
+        <div class="fg full"><label>Titre *</label><input id="mp-nom" placeholder="Titre du livre"></div>
+        <div class="fg" id="mp-mat-wrap"><label>Matière</label>
+          <select id="mp-mat"><option value="">—</option><option>Mathématiques</option><option>Français</option><option>Arabe</option><option>Physique-Chimie</option><option>SVT</option><option>Histoire-Géo</option><option>Anglais</option><option>Philosophie</option><option>Informatique</option></select>
+        </div>
+        <div class="fg" id="mp-niv-wrap"><label>Niveau</label>
+          <select id="mp-niv"><option value="">—</option><option>CE1 primaire</option><option>CE2 primaire</option><option>CM1 primaire</option><option>6ème collège</option><option>5ème collège</option><option>4ème collège</option><option>3ème collège</option><option>Tronc commun</option><option>1ère Bac</option><option>2ème Bac</option></select>
+        </div>
+        <div class="fg" id="mp-edit-wrap"><label>Éditeur</label><input id="mp-edit" placeholder="Maison d'édition"></div>
+        <div class="fg"><label>Emoji / Icône</label><input id="mp-emoji" placeholder="📗" style="font-size:1.2rem"></div>
+        <div class="fg"><label>Prix achat (DH)</label><input type="number" id="mp-pa" step="0.5" placeholder="0.00"></div>
+        <div class="fg"><label>Prix vente (DH)</label><input type="number" id="mp-pv" step="0.5" placeholder="0.00"></div>
+        <div class="fg"><label>Stock</label><input type="number" id="mp-stock" value="0" min="0"></div>
+        <div class="fg"><label>Seuil alerte</label><input type="number" id="mp-seuil" value="3" min="0"></div>
+        <div class="fg full"><label>Description</label><textarea id="mp-desc" rows="2" placeholder="Résumé court…"></textarea></div>
+        <div class="fg" style="flex-direction:row;align-items:center;gap:8px">
+          <input type="checkbox" id="mp-featured" style="width:auto;accent-color:var(--gold)">
+          <label style="margin:0;text-transform:none;font-size:.82rem;color:var(--text)">⭐ Mettre à la une</label>
+        </div>
+        <div class="fg" style="flex-direction:row;align-items:center;gap:8px">
+          <input type="checkbox" id="mp-visible" checked style="width:auto;accent-color:var(--gold)">
+          <label style="margin:0;text-transform:none;font-size:.82rem;color:var(--text)">🌐 Visible sur le site</label>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal('produit')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveProduit()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MODAL COMMANDE DETAIL ════════════════════════════════════════ -->
+<div class="ov" id="ov-cmd">
+  <div class="md">
+    <div class="mh"><h3 id="mc-num">Commande</h3><button class="mx" onclick="closeModal('cmd')">✕</button></div>
+    <div class="mb" id="mc-body"></div>
+    <div class="mf" id="mc-foot"></div>
+  </div>
+</div>
+
+<!-- ════ MODAL TARIF ══════════════════════════════════════════════════ -->
+<div class="ov" id="ov-tarif">
+  <div class="md">
+    <div class="mh"><h3 id="mt-title">Tarif photocopie</h3><button class="mx" onclick="closeModal('tarif')">✕</button></div>
+    <div class="mb">
+      <div class="fg"><label>Libellé *</label><input id="mt-lib" placeholder="Ex: Photocopie N&B recto"></div>
+      <div class="fg"><label>Prix / unité (DH) *</label><input type="number" id="mt-prix" step="0.1" placeholder="0.50"></div>
+      <div class="fg"><label>Description</label><input id="mt-desc" placeholder="Description optionnelle"></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal('tarif')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveTarif()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '/api/admin';
+let editProduitId=null, editTarifId=null, currentCmdId=null;
+let caisseOp='IAM', caisseMontant=null, caisseTarifId=null, caisseTarifPrix=0, caisseTarifNom='';
+
+// ── Date ──────────────────────────────────────────────────────────────
+document.getElementById('tb-date').textContent = new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ── Toast ─────────────────────────────────────────────────────────────
+function toast(msg,type='ok'){
+  const t=document.getElementById('toast');
+  t.className=`toast ${type} show`; t.textContent=msg;
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ── API ───────────────────────────────────────────────────────────────
+async function api(path,method='GET',body=null){
+  const o={method,headers:{'Content-Type':'application/json'}};
+  if(body) o.body=JSON.stringify(body);
+  const r=await fetch(API+path,o); const d=await r.json();
+  if(!r.ok) throw new Error(d.error||'Erreur');
+  return d;
+}
+
+// ── Nav ───────────────────────────────────────────────────────────────
+const titles={'dashboard':'Dashboard','commandes':'Commandes clients','recharges-srv':'Demandes de Recharges','photos-srv':'Demandes Photocopie','caisse-recharge':'Caisse — Recharges','caisse-photo':'Caisse — Photocopie','stock':'Stock Livres','fournitures':'Fournitures scolaires','tarifs':'Tarifs Photocopie','clients':'Clients','historique':'Historique'};
+function nav(el,page){
+  document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(`page-${page}`).classList.add('active');
+  document.getElementById('page-title').textContent=titles[page]||'';
+  const map={dashboard:loadDashboard,commandes:loadCommandes,'recharges-srv':loadRechargesSrv,'photos-srv':loadPhotosSrv,'caisse-recharge':loadCaisseRecharge,'caisse-photo':loadCaissePhoto,stock:loadStock,fournitures:loadFournitures,tarifs:loadTarifs,clients:loadClients,historique:loadHistorique};
+  if(map[page]) map[page]();
+}
+function refreshPage(){const a=document.querySelector('.sitem.active');if(a)a.click();}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────
+async function loadDashboard(){
+  const s=await api('/stats');
+  document.getElementById('d-camois').textContent=s.caMois.toFixed(2)+' DH';
+  document.getElementById('d-cajour').textContent=s.caCommandes.toFixed(2)+' DH';
+  document.getElementById('d-cmd').textContent=s.nbCommandes;
+  document.getElementById('d-rch').textContent=s.nbRecharges;
+  document.getElementById('d-pht').textContent=s.nbPhotos;
+  document.getElementById('d-alerte').textContent=s.stockAlerte.length;
+  // Badges sidebar
+  document.getElementById('nb-cmd').textContent=s.nbCommandes;
+  document.getElementById('nb-rch').textContent=s.nbRecharges;
+  document.getElementById('nb-pht').textContent=s.nbPhotos;
+  [document.getElementById('nb-cmd'),document.getElementById('nb-rch'),document.getElementById('nb-pht')].forEach(el=>{el.style.display=parseInt(el.textContent)>0?'inline':'none';});
+
+  // CA 7j
+  const max7=Math.max(...s.ca7j.map(d=>d.ca),1);
+  document.getElementById('d-ca7j').innerHTML=s.ca7j.map(d=>`
+    <div class="br"><div class="br-l">${d.jour.slice(5)}</div><div class="br-t"><div class="br-f" style="width:${(d.ca/max7*100).toFixed(0)}%;background:linear-gradient(90deg,var(--gold),var(--gold-lt))"></div></div><div class="br-v">${d.ca.toFixed(0)} DH</div></div>
+  `).join('')||'<p style="color:var(--text2);font-size:.78rem">Aucune donnée</p>';
+
+  // Top livres
+  document.getElementById('d-top').innerHTML=s.topProduits.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:.78rem">
+      <span style="color:var(--gold-lt);font-weight:700;width:16px">${i+1}</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.nom}</span>
+      <span class="mono">${p.vendu}× · ${p.ca.toFixed(0)} DH</span>
+    </div>
+  `).join('')||'<p style="color:var(--text2);font-size:.78rem">Aucune vente</p>';
+
+  // Op bars
+  const ops=[{k:'IAM',c:'var(--iam)'},{k:'Inwi',c:'var(--inwi)'},{k:'Orange',c:'var(--orange)'}];
+  const maxOp=Math.max(...ops.map(o=>(s.parOperateur.find(x=>x.operateur===o.k)?.total||0)),1);
+  document.getElementById('d-op').innerHTML=ops.map(({k,c})=>{
+    const d=s.parOperateur.find(x=>x.operateur===k)||{nb:0,total:0};
+    return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:4px"><span style="color:${c};font-weight:700">${k}</span><span class="mono" style="color:var(--text2)">${d.nb}× · ${d.total.toFixed(0)} DH</span></div><div class="br-t"><div class="br-f" style="width:${(d.total/maxOp*100).toFixed(0)}%;background:${c}"></div></div></div>`;
+  }).join('');
+
+  // Stock alerte
+  document.getElementById('d-stock-alert').innerHTML=s.stockAlerte.slice(0,5).map(p=>`
+    <div class="sal-item"><span class="sal-name">${p.nom}</span><span class="sal-stock">${p.stock} restant${p.stock===0?'':'s'}</span></div>
+  `).join('')||'<p style="color:var(--green);font-size:.75rem">✅ Tout le stock est suffisant</p>';
+}
+
+// ── COMMANDES ─────────────────────────────────────────────────────────
+async function loadCommandes(){
+  const statut=document.getElementById('cmd-filtre').value;
+  const list=await api(`/commandes${statut?'?statut='+statut:''}`);
+  const tb=document.getElementById('cmd-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">🛍️</div><p>Aucune commande</p></div></td></tr>';return;}
+  const sl={nouvelle:'🟡 Nouvelle',confirmee:'✅ Confirmée',prete:'📦 Prête',livree:'🎁 Livrée',annulee:'❌ Annulée'};
+  const sc={nouvelle:'bdg-y',confirmee:'bdg-g',prete:'bdg-b',livree:'bdg-p',annulee:'bdg-r'};
+  tb.innerHTML=list.map(c=>`<tr>
+    <td><span class="mono" style="color:var(--gold-lt)">${c.numero}</span></td>
+    <td><strong>${c.client_nom}</strong></td>
+    <td class="mono">${c.client_tel}</td>
+    <td><span class="bdg ${sc[c.statut]||'bdg-n'}">${sl[c.statut]||c.statut}</span></td>
+    <td class="mono" style="color:var(--gold-lt)">${c.total.toFixed(2)} DH</td>
+    <td class="mono" style="font-size:.72rem">${fmtDt(c.created_at)}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="ouvrirCommande('${c.id}')">📋 Détails</button></td>
+  </tr>`).join('');
+}
+
+async function ouvrirCommande(id){
+  const list=await api('/commandes');
+  const c=list.find(x=>x.id===id);
+  if(!c)return;
+  currentCmdId=id;
+  document.getElementById('mc-num').textContent=c.numero;
+  const sl={nouvelle:'🟡 Nouvelle',confirmee:'✅ Confirmée',prete:'📦 Prête',livree:'🎁 Livrée',annulee:'❌ Annulée'};
+  document.getElementById('mc-body').innerHTML=`
+    <div class="info-grid">
+      <div class="info-cell"><div class="lbl">Client</div><div class="val">${c.client_nom}</div></div>
+      <div class="info-cell"><div class="lbl">Téléphone</div><div class="val">${c.client_tel}</div></div>
+      <div class="info-cell"><div class="lbl">Statut</div><div class="val">${sl[c.statut]||c.statut}</div></div>
+      <div class="info-cell"><div class="lbl">Paiement</div><div class="val">${c.mode_paiement}</div></div>
+      ${c.client_adresse?`<div class="info-cell full"><div class="lbl">Adresse</div><div class="val">${c.client_adresse}</div></div>`:''}
+      ${c.notes?`<div class="info-cell full"><div class="lbl">Notes</div><div class="val">${c.notes}</div></div>`:''}
+    </div>
+    <div class="cmd-items">
+      ${c.items.map(i=>`<div class="cmd-item"><span>${i.nom} × ${i.quantite}</span><span style="font-family:'JetBrains Mono',monospace">${i.sous_total.toFixed(2)} DH</span></div>`).join('')}
+      <div class="cmd-total"><span>Total</span><span style="color:var(--gold-lt);font-family:'JetBrains Mono',monospace">${c.total.toFixed(2)} DH</span></div>
+    </div>`;
+  const nextSt={nouvelle:['confirmee','annulee'],confirmee:['prete','annulee'],prete:['livree'],livree:[],annulee:[]};
+  const lb={confirmee:'✅ Confirmer',prete:'📦 Marquer prête',livree:'🎁 Marquer livrée',annulee:'❌ Annuler'};
+  document.getElementById('mc-foot').innerHTML=`
+    <button class="btn btn-ghost" onclick="closeModal('cmd')">Fermer</button>
+    ${(nextSt[c.statut]||[]).map(s=>`<button class="btn ${s==='annulee'?'btn-r':'btn-g'} btn-sm" onclick="changerStatutCmd('${c.id}','${s}')">${lb[s]}</button>`).join('')}`;
+  document.getElementById('ov-cmd').classList.add('open');
+}
+
+async function changerStatutCmd(id,statut){
+  try{await api(`/commandes/${id}`,'PUT',{statut});toast('Statut mis à jour','ok');closeModal('cmd');loadCommandes();loadDashboard();}
+  catch(e){toast(e.message,'err');}
+}
+
+// ── RECHARGES SRV ─────────────────────────────────────────────────────
+async function loadRechargesSrv(){
+  const s=document.getElementById('rch-filtre').value;
+  const list=await api(`/recharges${s?'?statut='+s:''}`);
+  const tb=document.getElementById('rch-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><div class="ei">📶</div><p>Aucune demande</p></div></td></tr>';return;}
+  const opCls={IAM:'bdg-iam',Inwi:'bdg-inwi',Orange:'bdg-orange'};
+  const stCls={en_attente:'bdg-y',traitee:'bdg-g',annulee:'bdg-r'};
+  tb.innerHTML=list.map(r=>`<tr>
+    <td>${r.client_nom||'—'}</td>
+    <td class="mono">${r.client_tel}</td>
+    <td><span class="bdg ${opCls[r.operateur]||'bdg-n'}">${r.operateur}</span></td>
+    <td class="mono" style="color:var(--gold-lt);font-weight:700">${r.montant} DH</td>
+    <td><span class="bdg ${stCls[r.statut]||'bdg-n'}">${r.statut}</span></td>
+    <td class="mono" style="font-size:.72rem">${fmtDt(r.created_at)}</td>
+    <td>${r.statut==='en_attente'?`
+      <div style="display:flex;gap:5px">
+        <button class="btn btn-g btn-sm" onclick="majRecharge('${r.id}','traitee')">✅ Traiter</button>
+        <button class="btn btn-r btn-sm" onclick="majRecharge('${r.id}','annulee')">✕</button>
+      </div>`:'—'}
+    </td>
+  </tr>`).join('');
+}
+async function majRecharge(id,statut){
+  try{await api(`/recharges/${id}`,'PUT',{statut});toast('Mise à jour');loadRechargesSrv();loadDashboard();}
+  catch(e){toast(e.message,'err');}
+}
+
+// ── PHOTOS SRV ────────────────────────────────────────────────────────
+async function loadPhotosSrv(){
+  const s=document.getElementById('pht-filtre').value;
+  const list=await api(`/photos${s?'?statut='+s:''}`);
+  const tb=document.getElementById('pht-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="8"><div class="empty"><div class="ei">🖨️</div><p>Aucune demande</p></div></td></tr>';return;}
+  const stCls={en_attente:'bdg-y',traitee:'bdg-g'};
+  tb.innerHTML=list.map(p=>`<tr>
+    <td>${p.client_nom||'—'}</td>
+    <td class="mono">${p.client_tel||'—'}</td>
+    <td>${p.libelle}</td>
+    <td class="mono">${p.pages}</td>
+    <td class="mono" style="color:var(--gold-lt)">${p.total.toFixed(2)} DH</td>
+    <td style="color:var(--text2);font-size:.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis">${p.notes||'—'}</td>
+    <td><span class="bdg ${stCls[p.statut]||'bdg-n'}">${p.statut}</span></td>
+    <td>${p.statut==='en_attente'?`<button class="btn btn-g btn-sm" onclick="majPhoto('${p.id}','traitee')">✅ Traiter</button>`:'—'}</td>
+  </tr>`).join('');
+}
+async function majPhoto(id,statut){
+  try{await api(`/photos/${id}`,'PUT',{statut});toast('Traité');loadPhotosSrv();loadDashboard();}
+  catch(e){toast(e.message,'err');}
+}
+
+// ── CAISSE RECHARGE ───────────────────────────────────────────────────
+function loadCaisseRecharge(){
+  document.getElementById('crs-montants').innerHTML=[10,20,30,50,100].map(m=>`
+    <button class="mont-b" onclick="selMontant(this,${m})">${m} DH</button>
+  `).join('');
+  resetRechargeResume();
+}
+function selOp(op,el){
+  caisseOp=op; caisseMontant=null;
+  document.querySelectorAll('.op-b').forEach(b=>b.classList.remove('a'));
+  el.classList.add('a');
+  resetRechargeResume();
+  document.querySelectorAll('.mont-b').forEach(b=>b.classList.remove('sel'));
+}
+function selMontant(el,m){
+  caisseMontant=m;
+  document.querySelectorAll('.mont-b').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('crs-r-op').textContent=caisseOp;
+  document.getElementById('crs-r-mt').textContent=m+' DH';
+  document.getElementById('crs-r-total').textContent=m+'.00 DH';
+}
+function resetRechargeResume(){
+  document.getElementById('crs-r-op').textContent='—';
+  document.getElementById('crs-r-mt').textContent='—';
+  document.getElementById('crs-r-total').textContent='—';
+}
+async function vendireCaisseRecharge(){
+  if(!caisseMontant){toast('Choisissez un montant','err');return;}
+  try{
+    await api('/recharges/vendre','POST',{operateur:caisseOp,montant:caisseMontant,client_tel:document.getElementById('crs-tel').value||'—'});
+    toast(`✅ Recharge ${caisseOp} ${caisseMontant} DH enregistrée`,'ok');
+    caisseMontant=null; document.querySelectorAll('.mont-b').forEach(b=>b.classList.remove('sel'));
+    document.getElementById('crs-tel').value=''; resetRechargeResume(); loadDashboard();
+  }catch(e){toast(e.message,'err');}
+}
+
+// ── CAISSE PHOTO ──────────────────────────────────────────────────────
+async function loadCaissePhoto(){
+  const tarifs=await fetch('/api/tarifs-photo').then(r=>r.json());
+  document.getElementById('cp-tarifs').innerHTML=tarifs.map(t=>`
+    <div class="tarif-b" onclick="selTarifCaisse('${t.id}',${t.prix_unite},'${t.libelle.replace(/'/g,"\\'")}',this)">
+      <div><div class="tn">${t.libelle}</div><div style="font-size:.72rem;color:var(--text2)">${t.description||''}</div></div>
+      <div class="tp">${t.prix_unite.toFixed(2)} DH</div>
+    </div>
+  `).join('');
+  caisseTarifId=null; calcCaissePhoto();
+}
+function selTarifCaisse(id,prix,nom,el){
+  caisseTarifId=id; caisseTarifPrix=prix; caisseTarifNom=nom;
+  document.querySelectorAll('.tarif-b').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel'); calcCaissePhoto();
+}
+function calcCaissePhoto(){
+  if(!caisseTarifId)return;
+  const pages=parseInt(document.getElementById('cp-pages').value)||0;
+  document.getElementById('cp-r-nom').textContent=caisseTarifNom;
+  document.getElementById('cp-r-qty').textContent=pages+' pages';
+  document.getElementById('cp-r-total').textContent=(caisseTarifPrix*pages).toFixed(2)+' DH';
+}
+async function vendreCaissePhoto(){
+  if(!caisseTarifId){toast('Sélectionnez une prestation','err');return;}
+  const pages=parseInt(document.getElementById('cp-pages').value)||0;
+  if(pages<1){toast('Entrez le nombre de pages','err');return;}
+  try{
+    const r=await api('/photos/vendre','POST',{tarif_id:caisseTarifId,pages});
+    toast(`✅ Photocopie — ${pages} pages — ${r.total.toFixed(2)} DH`,'ok');
+    caisseTarifId=null; document.querySelectorAll('.tarif-b').forEach(t=>t.classList.remove('sel'));
+    document.getElementById('cp-pages').value=1; calcCaissePhoto(); loadDashboard();
+  }catch(e){toast(e.message,'err');}
+}
+
+// ── STOCK ─────────────────────────────────────────────────────────────
+async function loadStock(){
+  const s=document.getElementById('stk-search').value;
+  const list=await api(`/produits?categorie=livre&search=${encodeURIComponent(s)}`);
+  const tb=document.getElementById('stk-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="10"><div class="empty"><div class="ei">📚</div><p>Aucun livre</p></div></td></tr>';return;}
+  tb.innerHTML=list.map(p=>{
+    const marge=p.prix_achat>0?((p.prix-p.prix_achat)/p.prix_achat*100).toFixed(0):null;
+    const stk=p.stock===0?`<span class="bdg bdg-r">0</span>`:p.stock<=p.seuil_alerte?`<span class="bdg bdg-y">${p.stock}</span>`:`<span class="bdg bdg-g">${p.stock}</span>`;
+    return `<tr>
+      <td style="font-size:1.3rem">${p.image_emoji}</td>
+      <td><strong>${p.nom}</strong><br><span style="font-size:.72rem;color:var(--text2)">${p.editeur||''}</span></td>
+      <td>${p.matiere||'—'}</td>
+      <td>${p.niveau||'—'}</td>
+      <td class="mono">${p.prix_achat.toFixed(2)} DH</td>
+      <td class="mono" style="color:var(--gold-lt)">${p.prix.toFixed(2)} DH</td>
+      <td class="mono" style="color:var(--green)">${marge?marge+'%':'—'}</td>
+      <td>${stk}</td>
+      <td><span class="bdg ${p.visible?'bdg-g':'bdg-r'}">${p.visible?'Oui':'Non'}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-b btn-sm" onclick="ajusterStock('${p.id}',${p.stock})">📦 Stock</button>
+          <button class="btn btn-ghost btn-sm" onclick="editProduit('${p.id}')">✏️</button>
+          <button class="btn btn-r btn-sm" onclick="archiveProduit('${p.id}','${p.nom.replace(/'/g,"\\'")}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function setModalCategorie(cat){
+  document.getElementById('mp-categorie').value=cat;
+  const isFourn = cat==='fourniture';
+  ['mp-mat-wrap','mp-niv-wrap','mp-edit-wrap'].forEach(id=>{
+    document.getElementById(id).style.display = isFourn ? 'none' : '';
+  });
+}
+
+function openProduitModal(categorie){
+  categorie = categorie || 'livre';
+  editProduitId=null;
+  window.__signalementEnCours=null;
+  ['mp-nom','mp-edit','mp-emoji','mp-desc'].forEach(id=>document.getElementById(id).value='');
+  ['mp-mat','mp-niv'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mp-pa').value='';
+  document.getElementById('mp-pv').value='';
+  document.getElementById('mp-stock').value=0;
+  document.getElementById('mp-seuil').value=categorie==='fourniture'?5:3;
+  document.getElementById('mp-featured').checked=false;
+  document.getElementById('mp-visible').checked=categorie!=='fourniture';
+  document.getElementById('mp-emoji').value=categorie==='fourniture'?'✏️':'📗';
+  document.getElementById('mp-title').textContent=categorie==='fourniture'?'Nouvelle fourniture':'Nouveau livre';
+  setModalCategorie(categorie);
+  document.getElementById('ov-produit').classList.add('open');
+}
+async function editProduit(id){
+  window.__signalementEnCours=null;
+  const list=await api('/produits');
+  const p=list.find(x=>x.id===id); if(!p)return;
+  editProduitId=id;
+  const cat = p.categorie || 'livre';
+  document.getElementById('mp-nom').value=p.nom;
+  document.getElementById('mp-mat').value=p.matiere||'';
+  document.getElementById('mp-niv').value=p.niveau||'';
+  document.getElementById('mp-edit').value=p.editeur||'';
+  document.getElementById('mp-emoji').value=p.image_emoji||(cat==='fourniture'?'✏️':'📗');
+  document.getElementById('mp-pa').value=p.prix_achat;
+  document.getElementById('mp-pv').value=p.prix;
+  document.getElementById('mp-stock').value=p.stock;
+  document.getElementById('mp-seuil').value=p.seuil_alerte;
+  document.getElementById('mp-desc').value=p.description||'';
+  document.getElementById('mp-featured').checked=!!p.featured;
+  document.getElementById('mp-visible').checked=!!p.visible;
+  document.getElementById('mp-title').textContent=cat==='fourniture'?'Modifier la fourniture':'Modifier le livre';
+  setModalCategorie(cat);
+  document.getElementById('ov-produit').classList.add('open');
+}
+async function saveProduit(){
+  const categorie=document.getElementById('mp-categorie').value||'livre';
+  const body={
+    categorie,
+    nom:document.getElementById('mp-nom').value,
+    matiere:document.getElementById('mp-mat').value,
+    niveau:document.getElementById('mp-niv').value,
+    editeur:document.getElementById('mp-edit').value,
+    image_emoji:document.getElementById('mp-emoji').value||(categorie==='fourniture'?'✏️':'📗'),
+    prix_achat:parseFloat(document.getElementById('mp-pa').value)||0,
+    prix:parseFloat(document.getElementById('mp-pv').value)||0,
+    stock:parseInt(document.getElementById('mp-stock').value)||0,
+    seuil_alerte:parseInt(document.getElementById('mp-seuil').value)||3,
+    description:document.getElementById('mp-desc').value,
+    featured:document.getElementById('mp-featured').checked?1:0,
+    visible:document.getElementById('mp-visible').checked?1:0,
+  };
+  if(!body.nom){toast('Le nom est requis','err');return;}
+  try{
+    if(editProduitId) await api(`/produits/${editProduitId}`,'PUT',body);
+    else await api('/produits','POST',body);
+    const label = categorie==='fourniture'?'Fourniture':'Livre';
+    toast(editProduitId?`${label} modifié(e)`:`${label} ajouté(e)`,'ok');
+    if(window.__signalementEnCours){
+      try{ await api(`/fournitures/signalements/${window.__signalementEnCours}`,'DELETE'); }catch(_){}
+      window.__signalementEnCours=null;
+    }
+    closeModal('produit');
+    if(categorie==='fourniture'){ loadFournitures(); } else { loadStock(); }
+    loadDashboard();
+  }catch(e){toast(e.message,'err');}
+}
+async function ajusterStock(id,current){
+  const n=prompt(`Stock actuel: ${current}\nEntrez la nouvelle quantité totale:`);
+  if(n===null)return;
+  const delta=parseInt(n)-current;
+  try{await api(`/produits/${id}/stock`,'PATCH',{delta});toast('Stock mis à jour');loadStock();loadFournitures();loadDashboard();}
+  catch(e){toast(e.message,'err');}
+}
+async function archiveProduit(id,nom){
+  if(!confirm(`Archiver "${nom}" (masqué du site) ?`))return;
+  try{await api(`/produits/${id}`,'DELETE');toast('Produit archivé');loadStock();loadFournitures();loadDashboard();}
+  catch(e){toast(e.message,'err');}
+}
+
+// ── FOURNITURES ───────────────────────────────────────────────────────
+let fournPreviewItems=[];
+
+async function loadFournitures(){
+  loadSignalements();
+  const s=document.getElementById('fourn-search').value;
+  const list=await api(`/produits?categorie=fourniture&search=${encodeURIComponent(s)}`);
+  document.getElementById('nb-fourn').textContent=list.length;
+  const tb=document.getElementById('fourn-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">🎒</div><p>Aucune fourniture en stock — importez une liste PDF ci-dessus</p></div></td></tr>';return;}
+  tb.innerHTML=list.map(p=>{
+    const stk=p.stock===0?`<span class="bdg bdg-r">0</span>`:p.stock<=p.seuil_alerte?`<span class="bdg bdg-y">${p.stock}</span>`:`<span class="bdg bdg-g">${p.stock}</span>`;
+    return `<tr>
+      <td style="font-size:1.3rem">${p.image_emoji}</td>
+      <td><strong>${p.nom}</strong></td>
+      <td class="mono" style="color:var(--gold-lt)">${p.prix?p.prix.toFixed(2)+' DH':'—'}</td>
+      <td>${stk}</td>
+      <td><span class="bdg ${p.visible?'bdg-g':'bdg-r'}">${p.visible?'Oui':'Non'}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          <button class="btn btn-b btn-sm" onclick="ajusterStock('${p.id}',${p.stock})">📦 Stock</button>
+          <button class="btn btn-ghost btn-sm" onclick="editProduit('${p.id}')">✏️</button>
+          <button class="btn btn-r btn-sm" onclick="archiveProduit('${p.id}','${p.nom.replace(/'/g,"\\'")}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadSignalements(){
+  const list=await api('/fournitures/signalements');
+  const wrap=document.getElementById('fourn-signal-wrap');
+  const countEl=document.getElementById('fourn-signal-count');
+  countEl.textContent=list.length;
+  if(!list.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  document.getElementById('fourn-signal-tbody').innerHTML=list.map(s=>{
+    const statutBdg = s.type==='a_publier'
+      ? `<span class="bdg bdg-y">Existe — à publier/tarifer</span>`
+      : `<span class="bdg bdg-r">Article inconnu</span>`;
+    const action = s.type==='a_publier'
+      ? `<button class="btn btn-b btn-sm" onclick="publierDepuisSignalement('${s.id}','${s.produit_id}')">💰 Publier / tarifer</button>`
+      : `<button class="btn btn-gold btn-sm" onclick="creerDepuisSignalement('${s.id}','${s.nom_demande.replace(/'/g,"\\'")}')">＋ Ajouter au stock</button>`;
+    return `<tr>
+      <td><strong>${s.nom_demande}</strong></td>
+      <td>${s.quantite}</td>
+      <td>${s.occurrences}× ${s.occurrences>1?'clients':'client'}</td>
+      <td>${statutBdg}</td>
+      <td><div style="display:flex;gap:4px;flex-wrap:wrap">${action}<button class="btn btn-ghost btn-sm" onclick="ignorerSignalement('${s.id}')">Ignorer</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function publierDepuisSignalement(signalementId, produitId){
+  await editProduit(produitId);
+  window.__signalementEnCours = signalementId; // sera marqué "traité" une fois enregistré
+}
+
+function creerDepuisSignalement(signalementId, nomSuggere){
+  openProduitModal('fourniture');
+  document.getElementById('mp-nom').value = nomSuggere;
+  window.__signalementEnCours = signalementId; // sera marqué "traité" une fois enregistré
+}
+
+async function ignorerSignalement(id){
+  try{ await api(`/fournitures/signalements/${id}`,'DELETE'); loadSignalements(); }
+  catch(e){ toast(e.message,'err'); }
+}
+
+async function analyserPdfFournitures(){
+  const input=document.getElementById('fourn-pdf-input');
+  const statusEl=document.getElementById('fourn-pdf-status');
+  const btn=document.getElementById('fourn-analyser-btn');
+  if(!input.files.length){toast('Choisissez un fichier PDF','err');return;}
+  const file=input.files[0];
+  if(file.type!=='application/pdf'){toast('Le fichier doit être un PDF','err');return;}
+
+  const fd=new FormData();
+  fd.append('pdf',file);
+  btn.disabled=true; btn.textContent='⏳ Analyse en cours…'; statusEl.textContent='';
+  try{
+    const r=await fetch(API+'/fournitures/extraire',{method:'POST',body:fd});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'Erreur d\'analyse');
+    fournPreviewItems=d.items.map(it=>({...it, prix:0, include:true}));
+    renderFournPreview();
+    statusEl.textContent=`✅ ${d.items.length} article(s) détecté(s) sur ${d.nb_pages} page(s) — relisez avant import`;
+  }catch(e){
+    toast(e.message,'err');
+    statusEl.textContent='';
+  }finally{
+    btn.disabled=false; btn.textContent='🔍 Analyser le PDF';
+  }
+}
+
+function renderFournPreview(){
+  const tb=document.getElementById('fourn-preview-tbody');
+  document.getElementById('fourn-preview-wrap').style.display='block';
+  tb.innerHTML=fournPreviewItems.map((it,i)=>`<tr>
+    <td><input type="checkbox" ${it.include?'checked':''} onchange="fournPreviewItems[${i}].include=this.checked" style="width:auto;accent-color:var(--gold)"></td>
+    <td><input value="${it.nom.replace(/"/g,'&quot;')}" oninput="fournPreviewItems[${i}].nom=this.value" style="width:100%"></td>
+    <td><input type="number" min="0" value="${it.quantite}" oninput="fournPreviewItems[${i}].quantite=parseInt(this.value)||0" style="width:100%"></td>
+    <td><input type="number" min="0" step="0.5" value="${it.prix}" oninput="fournPreviewItems[${i}].prix=parseFloat(this.value)||0" style="width:100%"></td>
+  </tr>`).join('');
+}
+
+function toggleAllFourn(checked){
+  fournPreviewItems.forEach(it=>it.include=checked);
+  renderFournPreview();
+  document.getElementById('fourn-check-all').checked=checked;
+}
+
+function annulerPreviewFourn(){
+  fournPreviewItems=[];
+  document.getElementById('fourn-preview-wrap').style.display='none';
+  document.getElementById('fourn-pdf-input').value='';
+  document.getElementById('fourn-pdf-status').textContent='';
+}
+
+async function importerFournitures(){
+  const items=fournPreviewItems.filter(it=>it.include && it.nom.trim());
+  if(!items.length){toast('Sélectionnez au moins un article','err');return;}
+  try{
+    const d=await api('/fournitures/importer','POST',{items});
+    toast(d.message,'ok');
+    annulerPreviewFourn();
+    loadFournitures();
+    loadDashboard();
+  }catch(e){toast(e.message,'err');}
+}
+
+// ── TARIFS ────────────────────────────────────────────────────────────
+async function loadTarifs(){
+  const list=await api('/tarifs');
+  document.getElementById('tar-tbody').innerHTML=list.map(t=>`<tr>
+    <td><strong>${t.libelle}</strong></td>
+    <td style="color:var(--text2);font-size:.78rem">${t.description||'—'}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="number" value="${t.prix_unite}" step="0.1" min="0" id="tp-${t.id}" style="width:80px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--gold-lt);font-weight:700;font-family:'JetBrains Mono',monospace;padding:5px 8px">
+        <span style="color:var(--text2)">DH</span>
+        <button class="btn btn-ghost btn-sm" onclick="saveTarifInline('${t.id}')">💾</button>
+      </div>
+    </td>
+    <td><span class="bdg ${t.actif?'bdg-g':'bdg-r'}">${t.actif?'Actif':'Inactif'}</span></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick="toggleTarif('${t.id}',${t.actif})">${t.actif?'Désactiver':'Activer'}</button>
+    </td>
+  </tr>`).join('');
+}
+function openTarifModal(){
+  editTarifId=null;
+  ['mt-lib','mt-desc'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mt-prix').value='';
+  document.getElementById('mt-title').textContent='Nouveau tarif';
+  document.getElementById('ov-tarif').classList.add('open');
+}
+async function saveTarif(){
+  const body={libelle:document.getElementById('mt-lib').value,prix_unite:parseFloat(document.getElementById('mt-prix').value)||0,description:document.getElementById('mt-desc').value};
+  try{await api('/tarifs','POST',body);toast('Tarif ajouté');closeModal('tarif');loadTarifs();}
+  catch(e){toast(e.message,'err');}
+}
+async function saveTarifInline(id){
+  const prix=parseFloat(document.getElementById(`tp-${id}`).value)||0;
+  try{await api(`/tarifs/${id}`,'PUT',{prix_unite:prix});toast('Prix mis à jour');}
+  catch(e){toast(e.message,'err');}
+}
+async function toggleTarif(id,actif){
+  try{await api(`/tarifs/${id}`,'PUT',{actif:actif?0:1});toast('Tarif mis à jour');loadTarifs();}
+  catch(e){toast(e.message,'err');}
+}
+
+// ── CLIENTS ───────────────────────────────────────────────────────────
+async function loadClients(){
+  const list=await api('/clients');
+  const tb=document.getElementById('cli-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">👥</div><p>Aucun client</p></div></td></tr>';return;}
+  tb.innerHTML=list.map(c=>`<tr>
+    <td><strong>${c.nom}</strong></td>
+    <td class="mono">${c.telephone||'—'}</td>
+    <td style="color:var(--text2);font-size:.78rem">${c.adresse||'—'}</td>
+    <td class="mono">${c.nb_commandes}</td>
+    <td class="mono" style="color:var(--gold-lt)">${c.total_achats.toFixed(2)} DH</td>
+    <td class="mono" style="font-size:.72rem">${fmtDt(c.created_at)}</td>
+  </tr>`).join('');
+}
+
+// ── HISTORIQUE ────────────────────────────────────────────────────────
+async function loadHistorique(){
+  const d=document.getElementById('hist-debut').value;
+  const f=document.getElementById('hist-fin').value;
+  const list=await api(`/historique${d||f?'?'+(d?'debut='+d:'')+(d&&f?'&':'')+(f?'fin='+f:''):''}`);
+  const tb=document.getElementById('hist-tbody');
+  if(!list.length){tb.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">🕒</div><p>Aucune vente</p></div></td></tr>';return;}
+  const tc={recharge:'bdg-iam',photocopie:'bdg-y',livre:'bdg-g',commande:'bdg-b'};
+  tb.innerHTML=list.map(v=>`<tr>
+    <td class="mono" style="font-size:.72rem">${fmtDt(v.created_at)}</td>
+    <td><span class="bdg ${tc[v.type]||'bdg-n'}">${v.type}</span></td>
+    <td style="color:var(--text2);font-size:.78rem">${v.description||'—'}</td>
+    <td class="mono">${v.quantite}</td>
+    <td class="mono">${v.prix_unitaire.toFixed(2)} DH</td>
+    <td class="mono" style="color:var(--gold-lt);font-weight:700">${v.total.toFixed(2)} DH</td>
+  </tr>`).join('');
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+function closeModal(n){document.getElementById(`ov-${n}`).classList.remove('open');}
+document.querySelectorAll('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');}));
+function fmtDt(d){return new Date(d).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'});}
+
+// ── Init ──────────────────────────────────────────────────────────────
+loadDashboard();
+</script>
+</body>
+</html>

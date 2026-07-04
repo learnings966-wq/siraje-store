@@ -1,0 +1,25 @@
+{
+  "name": "siraje-store",
+  "version": "2.0.0",
+  "description": "SIRAJE STORE — Livres scolaires · Photocopie · Recharges",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongodb": "^6.9.0",
+    "multer": "^2.2.0",
+    "pdf-parse": "^1.1.1",
+    "pngjs": "^7.0.0",
+    "tesseract.js": "^5.1.1",
+    "unpdf": "^1.6.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}

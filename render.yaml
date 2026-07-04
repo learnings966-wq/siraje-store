@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: siraje-store
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: MONGODB_URI
+        sync: false   # à saisir manuellement dans le dashboard Render (secret)
