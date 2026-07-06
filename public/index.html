@@ -718,9 +718,9 @@ footer{
     </div>
     <div class="footer-col">
       <h4>Nous trouver</h4>
-      <a href="#">📍 Marrakech, Maroc</a>
-      <a href="#">📞 +212 6 XX XX XX XX</a>
-      <a href="#">🕐 Lun–Sam : 8h–20h</a>
+      <a href="#" id="footer-adresse">📍 Marrakech, Maroc</a>
+      <a href="#" id="footer-telephone">📞 +212 6 XX XX XX XX</a>
+      <a href="#" id="footer-horaires">🕐 Lun–Sam : 8h–20h</a>
     </div>
   </div>
   <div class="footer-bottom">© 2025 SIRAJE STORE — Tous droits réservés.</div>
@@ -1480,6 +1480,13 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js').catch(() => {});
   });
 }
+
+// Charge les coordonnées du magasin (adresse/téléphone/horaires) depuis l'admin
+fetch('/api/parametres').then(r => r.json()).then(p => {
+  if (p.adresse)   document.getElementById('footer-adresse').textContent   = p.adresse;
+  if (p.telephone) document.getElementById('footer-telephone').textContent = p.telephone;
+  if (p.horaires)  document.getElementById('footer-horaires').textContent  = p.horaires;
+}).catch(() => {}); // en cas d'échec, le texte par défaut déjà dans le HTML reste affiché
 </script>
 </body>
 </html>

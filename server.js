@@ -108,7 +108,12 @@ async function initDB() {
     demandes_recharge: [],
     demandes_photo: [],
     ventes_caisse: [],
-    signalements_fournitures: []
+    signalements_fournitures: [],
+    parametres: {
+      adresse: '📍 Marrakech, Maroc',
+      telephone: '📞 +212 6 XX XX XX XX',
+      horaires: '🕐 Lun–Sam : 8h–20h'
+    }
   };
 
   // ── Livres scolaires ───────────────────────────────────────────────
@@ -170,6 +175,11 @@ function isoNow() { return new Date().toISOString(); }
 // ═══════════════════════════════════════════════════════════════════════
 //  API PUBLIQUE — STOREFRONT
 // ═══════════════════════════════════════════════════════════════════════
+
+// Coordonnées du magasin (adresse, téléphone, horaires) — affichées dans le footer public
+app.get('/api/parametres', (req, res) => {
+  res.json(DB.parametres || {});
+});
 
 // Catalogue produits
 app.get('/api/produits', (req, res) => {
@@ -795,6 +805,22 @@ app.post('/api/admin/photos/vendre', (req, res) => {
   res.status(201).json({ total, message: 'Vente enregistrée' });
 });
 
+// ── Paramètres du magasin (adresse, téléphone, horaires) ────────────────
+app.get('/api/admin/parametres', (req, res) => {
+  res.json(DB.parametres || {});
+});
+
+app.put('/api/admin/parametres', (req, res) => {
+  const { adresse, telephone, horaires } = req.body;
+  DB.parametres = {
+    adresse: adresse ?? DB.parametres?.adresse ?? '',
+    telephone: telephone ?? DB.parametres?.telephone ?? '',
+    horaires: horaires ?? DB.parametres?.horaires ?? ''
+  };
+  save();
+  res.json(DB.parametres);
+});
+
 // ── Tarifs ─────────────────────────────────────────────────────────────
 app.get('/api/admin/tarifs', (req, res) => {
   res.json([...DB.tarifs_photo].sort((a,b) => a.prix_unite - b.prix_unite));
@@ -854,6 +880,14 @@ async function bootstrap() {
     await connectMongo();
     DB = await initDB();
     if (!Array.isArray(DB.signalements_fournitures)) DB.signalements_fournitures = [];
+    if (!DB.parametres) {
+      DB.parametres = {
+        adresse: '📍 Marrakech, Maroc',
+        telephone: '📞 +212 6 XX XX XX XX',
+        horaires: '🕐 Lun–Sam : 8h–20h'
+      };
+      save();
+    }
 
     app.listen(PORT, () => {
       console.log(`\n✨ SIRAJE STORE → http://localhost:${PORT}`);

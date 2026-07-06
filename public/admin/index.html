@@ -216,6 +216,7 @@ textarea{resize:vertical;min-height:60px;}
     <div class="sitem" onclick="nav(this,'tarifs')"><span class="si">🏷️</span> Tarifs photocopie</div>
     <div class="sitem" onclick="nav(this,'clients')"><span class="si">👥</span> Clients</div>
     <div class="sitem" onclick="nav(this,'historique')"><span class="si">🕒</span> Historique</div>
+    <div class="sitem" onclick="nav(this,'parametres')"><span class="si">⚙️</span> Paramètres</div>
   </nav>
   <a href="/" class="site-link">🌐 Voir le site client</a>
   <div class="sfooter"><div class="dot"></div> Serveur actif · :3000</div>
@@ -478,6 +479,22 @@ textarea{resize:vertical;min-height:60px;}
       </table>
     </div>
   </div>
+
+  <!-- ══ PARAMÈTRES ══════════════════════════════════════════════════ -->
+  <div class="page" id="page-parametres">
+    <div class="ph"><div><h2>Paramètres du magasin</h2><p>Coordonnées affichées publiquement sur le site (footer)</p></div></div>
+    <div class="tw" style="padding:20px;">
+      <div class="fgrid">
+        <div class="fg full"><label>Adresse</label><input id="pm-adresse" placeholder="📍 Marrakech, Maroc"></div>
+        <div class="fg full"><label>Téléphone</label><input id="pm-telephone" placeholder="📞 +212 6 XX XX XX XX"></div>
+        <div class="fg full"><label>Horaires</label><input id="pm-horaires" placeholder="🕐 Lun–Sam : 8h–20h"></div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn btn-gold" onclick="saveParametres()">💾 Enregistrer</button>
+        <span id="pm-saved" style="display:none;color:var(--gold);font-size:.82rem;margin-left:10px;">✅ Enregistré</span>
+      </div>
+    </div>
+  </div>
 </main>
 
 <!-- ════ MODAL PRODUIT ════════════════════════════════════════════════ -->
@@ -571,14 +588,14 @@ async function api(path,method='GET',body=null){
 }
 
 // ── Nav ───────────────────────────────────────────────────────────────
-const titles={'dashboard':'Dashboard','commandes':'Commandes clients','recharges-srv':'Demandes de Recharges','photos-srv':'Demandes Photocopie','caisse-recharge':'Caisse — Recharges','caisse-photo':'Caisse — Photocopie','stock':'Stock Livres','fournitures':'Fournitures scolaires','tarifs':'Tarifs Photocopie','clients':'Clients','historique':'Historique'};
+const titles={'dashboard':'Dashboard','commandes':'Commandes clients','recharges-srv':'Demandes de Recharges','photos-srv':'Demandes Photocopie','caisse-recharge':'Caisse — Recharges','caisse-photo':'Caisse — Photocopie','stock':'Stock Livres','fournitures':'Fournitures scolaires','tarifs':'Tarifs Photocopie','clients':'Clients','historique':'Historique','parametres':'Paramètres'};
 function nav(el,page){
   document.querySelectorAll('.sitem').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById(`page-${page}`).classList.add('active');
   document.getElementById('page-title').textContent=titles[page]||'';
-  const map={dashboard:loadDashboard,commandes:loadCommandes,'recharges-srv':loadRechargesSrv,'photos-srv':loadPhotosSrv,'caisse-recharge':loadCaisseRecharge,'caisse-photo':loadCaissePhoto,stock:loadStock,fournitures:loadFournitures,tarifs:loadTarifs,clients:loadClients,historique:loadHistorique};
+  const map={dashboard:loadDashboard,commandes:loadCommandes,'recharges-srv':loadRechargesSrv,'photos-srv':loadPhotosSrv,'caisse-recharge':loadCaisseRecharge,'caisse-photo':loadCaissePhoto,stock:loadStock,fournitures:loadFournitures,tarifs:loadTarifs,clients:loadClients,historique:loadHistorique,parametres:loadParametres};
   if(map[page]) map[page]();
 }
 function refreshPage(){const a=document.querySelector('.sitem.active');if(a)a.click();}
@@ -1127,6 +1144,24 @@ async function loadHistorique(){
     <td class="mono">${v.prix_unitaire.toFixed(2)} DH</td>
     <td class="mono" style="color:var(--gold-lt);font-weight:700">${v.total.toFixed(2)} DH</td>
   </tr>`).join('');
+}
+
+// ── Paramètres du magasin ─────────────────────────────────────────────
+async function loadParametres(){
+  const p=await api('/parametres');
+  document.getElementById('pm-adresse').value=p.adresse||'';
+  document.getElementById('pm-telephone').value=p.telephone||'';
+  document.getElementById('pm-horaires').value=p.horaires||'';
+}
+async function saveParametres(){
+  await api('/parametres','PUT',{
+    adresse:document.getElementById('pm-adresse').value,
+    telephone:document.getElementById('pm-telephone').value,
+    horaires:document.getElementById('pm-horaires').value
+  });
+  const ok=document.getElementById('pm-saved');
+  ok.style.display='inline';
+  setTimeout(()=>ok.style.display='none',2500);
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────
