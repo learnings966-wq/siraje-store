@@ -49,6 +49,37 @@ const uploadPdf = multer({
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// ═══════════════════════════════════════════════════════════════════════
+//  PROTECTION DE L'ADMINISTRATION (Basic Auth HTTP)
+//  Identifiants définis via variables d'environnement ADMIN_USER / ADMIN_PASSWORD
+//  (à définir sur Render, ET dans un .env local si besoin en dev).
+//  Doit être placé AVANT express.static, sinon public/admin/index.html
+//  serait servi directement sans passer par cette vérification.
+// ═══════════════════════════════════════════════════════════════════════
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || null;
+
+function adminAuth(req, res, next) {
+  if (!req.path.startsWith('/admin') && !req.path.startsWith('/api/admin')) return next();
+
+  if (!ADMIN_PASSWORD) {
+    // Sécurité : si la variable n'est pas configurée, on bloque plutôt que de laisser un accès ouvert par défaut.
+    return res.status(503).send('Administration non configurée : variable ADMIN_PASSWORD manquante sur le serveur.');
+  }
+
+  const header = req.headers.authorization || '';
+  const [scheme, encoded] = header.split(' ');
+  if (scheme === 'Basic' && encoded) {
+    const [user, pass] = Buffer.from(encoded, 'base64').toString('utf8').split(':');
+    if (user === ADMIN_USER && pass === ADMIN_PASSWORD) return next();
+  }
+
+  res.set('WWW-Authenticate', 'Basic realm="Siraje Store Admin"');
+  return res.status(401).send('Authentification requise.');
+}
+
+app.use(adminAuth);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ═══════════════════════════════════════════════════════════════════════
