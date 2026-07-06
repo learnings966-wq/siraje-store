@@ -4,3 +4,4 @@ node_modules/
 android/app/build/
 android/.gradle/
 siraje_data.json
+uploads_impression/

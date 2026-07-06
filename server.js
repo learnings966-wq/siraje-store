@@ -47,6 +47,27 @@ const uploadPdf = multer({
   }
 });
 
+// Upload fichiers à imprimer — écrit sur disque (temporaire, tant que le service
+// n'est pas redémarré ; suffisant pour un aller-retour rapide client → magasin).
+// PDF, images et documents Word/Excel courants, 15 Mo max.
+const IMPRESSION_DIR = path.join(__dirname, 'uploads_impression');
+if (!fs.existsSync(IMPRESSION_DIR)) fs.mkdirSync(IMPRESSION_DIR, { recursive: true });
+
+const uploadImpression = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, IMPRESSION_DIR),
+    filename: (req, file, cb) => cb(null, `${uuidv4()}${path.extname(file.originalname) || ''}`)
+  }),
+  limits: { fileSize: 15 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const autorises = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+    if (!autorises.includes(file.mimetype)) return cb(new Error('Format non supporté (PDF, image, Word ou Excel uniquement)'));
+    cb(null, true);
+  }
+});
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -81,6 +102,7 @@ function adminAuth(req, res, next) {
 
 app.use(adminAuth);
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads_impression', express.static(IMPRESSION_DIR));
 
 // ═══════════════════════════════════════════════════════════════════════
 //  BASE DE DONNÉES JSON
@@ -112,7 +134,9 @@ async function initDB() {
     parametres: {
       adresse: '📍 Marrakech, Maroc',
       telephone: '📞 +212 6 XX XX XX XX',
-      horaires: '🕐 Lun–Sam : 8h–20h'
+      horaires: '🕐 Lun–Sam : 8h–20h',
+      whatsapp: '',   // format international sans + ni espaces, ex: 212612345678
+      email: ''
     }
   };
 
@@ -298,6 +322,16 @@ app.post('/api/services/photo', (req, res) => {
   DB.demandes_photo.push({ id, tarif_id, libelle: tarif.libelle, pages: +pages, total, client_nom: client_nom||'Client', client_tel: client_tel||null, notes: notes||null, statut:'en_attente', created_at: isoNow() });
   save();
   res.status(201).json({ id, total, message:`Demande enregistrée — total estimé : ${total} DH` });
+});
+
+// Upload d'un fichier à imprimer (client) — renvoie un lien de téléchargement
+// direct, utilisable ensuite dans un message WhatsApp/email pré-rempli.
+app.post('/api/photos/upload-fichier', uploadImpression.single('fichier'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Aucun fichier reçu' });
+  res.status(201).json({
+    url: `/uploads_impression/${req.file.filename}`,
+    nom_original: req.file.originalname
+  });
 });
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -811,11 +845,13 @@ app.get('/api/admin/parametres', (req, res) => {
 });
 
 app.put('/api/admin/parametres', (req, res) => {
-  const { adresse, telephone, horaires } = req.body;
+  const { adresse, telephone, horaires, whatsapp, email } = req.body;
   DB.parametres = {
     adresse: adresse ?? DB.parametres?.adresse ?? '',
     telephone: telephone ?? DB.parametres?.telephone ?? '',
-    horaires: horaires ?? DB.parametres?.horaires ?? ''
+    horaires: horaires ?? DB.parametres?.horaires ?? '',
+    whatsapp: whatsapp ?? DB.parametres?.whatsapp ?? '',
+    email: email ?? DB.parametres?.email ?? ''
   };
   save();
   res.json(DB.parametres);
@@ -863,8 +899,8 @@ app.get('/api/admin/historique', (req, res) => {
 
 // ── Gestion d'erreurs upload (multer) ────────────────────────────────────
 app.use((err, req, res, next) => {
-  if (err instanceof multer.MulterError || (err && /PDF/.test(err.message))) {
-    return res.status(400).json({ error: err.message === 'File too large' ? 'Fichier trop volumineux (8 Mo max)' : err.message });
+  if (err instanceof multer.MulterError || (err && /PDF|non supporté/.test(err.message))) {
+    return res.status(400).json({ error: err.message === 'File too large' ? 'Fichier trop volumineux (15 Mo max)' : err.message });
   }
   next(err);
 });
@@ -884,10 +920,14 @@ async function bootstrap() {
       DB.parametres = {
         adresse: '📍 Marrakech, Maroc',
         telephone: '📞 +212 6 XX XX XX XX',
-        horaires: '🕐 Lun–Sam : 8h–20h'
+        horaires: '🕐 Lun–Sam : 8h–20h',
+        whatsapp: '',
+        email: ''
       };
       save();
     }
+    if (DB.parametres.whatsapp === undefined) { DB.parametres.whatsapp = ''; save(); }
+    if (DB.parametres.email === undefined)    { DB.parametres.email = '';    save(); }
 
     app.listen(PORT, () => {
       console.log(`\n✨ SIRAJE STORE → http://localhost:${PORT}`);
