@@ -489,7 +489,6 @@ textarea{resize:vertical;min-height:60px;}
         <div class="fg full"><label>Téléphone</label><input id="pm-telephone" placeholder="📞 +212 6 XX XX XX XX"></div>
         <div class="fg full"><label>Horaires</label><input id="pm-horaires" placeholder="🕐 Lun–Sam : 8h–20h"></div>
         <div class="fg"><label>WhatsApp (réception fichiers à imprimer)</label><input id="pm-whatsapp" placeholder="212612345678 (sans + ni espaces)"></div>
-        <div class="fg"><label>Email (réception fichiers à imprimer)</label><input id="pm-email" placeholder="contact@sirajestore.ma"></div>
       </div>
       <div style="margin-top:16px;">
         <button class="btn btn-gold" onclick="saveParametres()">💾 Enregistrer</button>
@@ -1155,15 +1154,13 @@ async function loadParametres(){
   document.getElementById('pm-telephone').value=p.telephone||'';
   document.getElementById('pm-horaires').value=p.horaires||'';
   document.getElementById('pm-whatsapp').value=p.whatsapp||'';
-  document.getElementById('pm-email').value=p.email||'';
 }
 async function saveParametres(){
   await api('/parametres','PUT',{
     adresse:document.getElementById('pm-adresse').value,
     telephone:document.getElementById('pm-telephone').value,
     horaires:document.getElementById('pm-horaires').value,
-    whatsapp:document.getElementById('pm-whatsapp').value.replace(/[^0-9]/g,''),
-    email:document.getElementById('pm-email').value
+    whatsapp:document.getElementById('pm-whatsapp').value.replace(/[^0-9]/g,'')
   });
   const ok=document.getElementById('pm-saved');
   ok.style.display='inline';

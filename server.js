@@ -135,8 +135,7 @@ async function initDB() {
       adresse: '📍 Marrakech, Maroc',
       telephone: '📞 +212 6 XX XX XX XX',
       horaires: '🕐 Lun–Sam : 8h–20h',
-      whatsapp: '',   // format international sans + ni espaces, ex: 212612345678
-      email: ''
+      whatsapp: ''   // format international sans + ni espaces, ex: 212612345678
     }
   };
 
@@ -845,13 +844,12 @@ app.get('/api/admin/parametres', (req, res) => {
 });
 
 app.put('/api/admin/parametres', (req, res) => {
-  const { adresse, telephone, horaires, whatsapp, email } = req.body;
+  const { adresse, telephone, horaires, whatsapp } = req.body;
   DB.parametres = {
     adresse: adresse ?? DB.parametres?.adresse ?? '',
     telephone: telephone ?? DB.parametres?.telephone ?? '',
     horaires: horaires ?? DB.parametres?.horaires ?? '',
-    whatsapp: whatsapp ?? DB.parametres?.whatsapp ?? '',
-    email: email ?? DB.parametres?.email ?? ''
+    whatsapp: whatsapp ?? DB.parametres?.whatsapp ?? ''
   };
   save();
   res.json(DB.parametres);
@@ -921,13 +919,11 @@ async function bootstrap() {
         adresse: '📍 Marrakech, Maroc',
         telephone: '📞 +212 6 XX XX XX XX',
         horaires: '🕐 Lun–Sam : 8h–20h',
-        whatsapp: '',
-        email: ''
+        whatsapp: ''
       };
       save();
     }
     if (DB.parametres.whatsapp === undefined) { DB.parametres.whatsapp = ''; save(); }
-    if (DB.parametres.email === undefined)    { DB.parametres.email = '';    save(); }
 
     app.listen(PORT, () => {
       console.log(`\n✨ SIRAJE STORE → http://localhost:${PORT}`);

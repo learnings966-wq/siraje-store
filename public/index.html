@@ -691,7 +691,6 @@ footer{
           <div id="ph-upload-status" style="display:none;margin-top:10px;font-size:.8rem;color:var(--gold);"></div>
           <div id="ph-share-buttons" style="display:none;margin-top:10px;gap:8px;flex-direction:column;">
             <button class="btn btn-block" style="background:#25D366;color:#fff;" onclick="envoyerFichierWhatsapp()">📲 Envoyer via WhatsApp</button>
-            <button class="btn btn-ghost btn-block" onclick="envoyerFichierEmail()">✉️ Envoyer par email</button>
           </div>
         </div>
       </div>
@@ -1089,15 +1088,6 @@ function envoyerFichierWhatsapp() {
   if (!numero) { toast('Numéro WhatsApp du magasin non configuré (admin → Paramètres)','err'); return; }
   const url = `https://wa.me/${numero}?text=${encodeURIComponent(messageImpression())}`;
   window.open(url, '_blank');
-}
-
-function envoyerFichierEmail() {
-  if (!fichierImpressionUrl) return;
-  const email = magasinParams.email || '';
-  if (!email) { toast('Email du magasin non configuré (admin → Paramètres)','err'); return; }
-  const sujet = encodeURIComponent(`Fichier à imprimer — ${fichierImpressionNom}`);
-  const corps = encodeURIComponent(messageImpression());
-  window.location.href = `mailto:${email}?subject=${sujet}&body=${corps}`;
 }
 
 // ── Checkout ──────────────────────────────────────────────────────────
