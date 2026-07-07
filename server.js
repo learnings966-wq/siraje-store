@@ -394,6 +394,31 @@ app.get('/api/admin/stats', (req, res) => {
     nbCommandes, nbRecharges, nbPhotos, stockAlerte, ca7j, topProduits, parOperateur });
 });
 
+// Réinitialise le mois en cours : supprime commandes, recharges, demandes photo
+// et ventes caisse créées ce mois-ci (utile pour effacer des données de test).
+// Restaure le stock consommé par les commandes supprimées (hors commandes déjà annulées).
+app.post('/api/admin/reset-mois', (req, res) => {
+  const mois = thisMonth();
+
+  const cmdsMois = DB.commandes.filter(c => c.created_at.startsWith(mois));
+  cmdsMois.forEach(c => {
+    if (c.statut === 'annulee') return; // stock déjà restauré à l'annulation
+    DB.commande_items.filter(i => i.commande_id === c.id).forEach(i => {
+      const p = DB.produits.find(x => x.id === i.produit_id);
+      if (p) p.stock += i.quantite;
+    });
+  });
+
+  const idsCmdsMois = new Set(cmdsMois.map(c => c.id));
+  DB.commande_items    = DB.commande_items.filter(i => !idsCmdsMois.has(i.commande_id));
+  DB.commandes          = DB.commandes.filter(c => !c.created_at.startsWith(mois));
+  DB.demandes_recharge  = DB.demandes_recharge.filter(r => !r.created_at.startsWith(mois));
+  DB.demandes_photo     = DB.demandes_photo.filter(p => !p.created_at.startsWith(mois));
+  DB.ventes_caisse      = DB.ventes_caisse.filter(v => !v.created_at.startsWith(mois));
+  save();
+  res.json({ ok: true });
+});
+
 // ── Commandes ──────────────────────────────────────────────────────────
 app.get('/api/admin/commandes', (req, res) => {
   const { statut } = req.query;

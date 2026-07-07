@@ -236,6 +236,9 @@ textarea{resize:vertical;min-height:60px;}
 
   <!-- ══ DASHBOARD ════════════════════════════════════════════════ -->
   <div class="page active" id="page-dashboard">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn-r btn-sm" onclick="resetMois()">🗑 Réinitialiser le CA du mois (données de test)</button>
+    </div>
     <div class="sg">
       <div class="sc"><div class="sc-ico">💰</div><div class="sc-val" id="d-camois">—</div><div class="sc-lbl">CA total ce mois</div></div>
       <div class="sc g"><div class="sc-ico">📅</div><div class="sc-val" id="d-cajour">—</div><div class="sc-lbl">CA aujourd'hui</div></div>
@@ -643,6 +646,16 @@ async function loadDashboard(){
   document.getElementById('d-stock-alert').innerHTML=s.stockAlerte.slice(0,5).map(p=>`
     <div class="sal-item"><span class="sal-name">${p.nom}</span><span class="sal-stock">${p.stock} restant${p.stock===0?'':'s'}</span></div>
   `).join('')||'<p style="color:var(--green);font-size:.75rem">✅ Tout le stock est suffisant</p>';
+}
+
+async function resetMois(){
+  if(!confirm('⚠️ Ceci va supprimer DÉFINITIVEMENT toutes les commandes, recharges, demandes photocopie et ventes caisse enregistrées CE MOIS-CI (le stock consommé sera restauré). Les produits, tarifs et clients ne sont pas touchés.\n\nContinuer ?'))return;
+  if(!confirm('Dernière confirmation : cette action est irréversible. Vraiment tout effacer pour ce mois ?'))return;
+  try{
+    await api('/reset-mois','POST');
+    toast('Données du mois réinitialisées');
+    loadDashboard();
+  }catch(e){toast(e.message,'err');}
 }
 
 // ── COMMANDES ─────────────────────────────────────────────────────────
