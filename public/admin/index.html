@@ -459,7 +459,7 @@ textarea{resize:vertical;min-height:60px;}
     <div class="ph"><div><h2>Clients</h2><p>Base clients enregistrés</p></div></div>
     <div class="tw">
       <table>
-        <thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th><th>Commandes</th><th>Total achats</th><th>Depuis</th></tr></thead>
+        <thead><tr><th>Nom</th><th>Téléphone</th><th>Adresse</th><th>Commandes</th><th>Total achats</th><th>Depuis</th><th>Actions</th></tr></thead>
         <tbody id="cli-tbody"></tbody>
       </table>
     </div>
@@ -660,8 +660,17 @@ async function loadCommandes(){
     <td><span class="bdg ${sc[c.statut]||'bdg-n'}">${sl[c.statut]||c.statut}</span></td>
     <td class="mono" style="color:var(--gold-lt)">${c.total.toFixed(2)} DH</td>
     <td class="mono" style="font-size:.72rem">${fmtDt(c.created_at)}</td>
-    <td><button class="btn btn-ghost btn-sm" onclick="ouvrirCommande('${c.id}')">📋 Détails</button></td>
+    <td>
+      <button class="btn btn-ghost btn-sm" onclick="ouvrirCommande('${c.id}')">📋 Détails</button>
+      <button class="btn btn-r btn-sm" onclick="deleteCommande('${c.id}','${c.numero}')">🗑</button>
+    </td>
   </tr>`).join('');
+}
+
+async function deleteCommande(id,numero){
+  if(!confirm(`Supprimer définitivement la commande ${numero} ? Cette action est irréversible.`))return;
+  try{await api(`/commandes/${id}`,'DELETE');toast('Commande supprimée');loadCommandes();loadDashboard();}
+  catch(e){toast(e.message,'err');}
 }
 
 async function ouvrirCommande(id){
@@ -712,13 +721,21 @@ async function loadRechargesSrv(){
     <td class="mono" style="color:var(--gold-lt);font-weight:700">${r.montant} DH</td>
     <td><span class="bdg ${stCls[r.statut]||'bdg-n'}">${r.statut}</span></td>
     <td class="mono" style="font-size:.72rem">${fmtDt(r.created_at)}</td>
-    <td>${r.statut==='en_attente'?`
-      <div style="display:flex;gap:5px">
-        <button class="btn btn-g btn-sm" onclick="majRecharge('${r.id}','traitee')">✅ Traiter</button>
-        <button class="btn btn-r btn-sm" onclick="majRecharge('${r.id}','annulee')">✕</button>
-      </div>`:'—'}
+    <td>
+      <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+        ${r.statut==='en_attente'?`
+          <button class="btn btn-g btn-sm" onclick="majRecharge('${r.id}','traitee')">✅ Traiter</button>
+          <button class="btn btn-r btn-sm" onclick="majRecharge('${r.id}','annulee')">✕</button>
+        `:''}
+        <button class="btn btn-r btn-sm" onclick="deleteRecharge('${r.id}')">🗑</button>
+      </div>
     </td>
   </tr>`).join('');
+}
+async function deleteRecharge(id){
+  if(!confirm('Supprimer définitivement cette demande de recharge ?'))return;
+  try{await api(`/recharges/${id}`,'DELETE');toast('Demande supprimée');loadRechargesSrv();}
+  catch(e){toast(e.message,'err');}
 }
 async function majRecharge(id,statut){
   try{await api(`/recharges/${id}`,'PUT',{statut});toast('Mise à jour');loadRechargesSrv();loadDashboard();}
@@ -740,8 +757,18 @@ async function loadPhotosSrv(){
     <td class="mono" style="color:var(--gold-lt)">${p.total.toFixed(2)} DH</td>
     <td style="color:var(--text2);font-size:.75rem;max-width:120px;overflow:hidden;text-overflow:ellipsis">${p.notes||'—'}</td>
     <td><span class="bdg ${stCls[p.statut]||'bdg-n'}">${p.statut}</span></td>
-    <td>${p.statut==='en_attente'?`<button class="btn btn-g btn-sm" onclick="majPhoto('${p.id}','traitee')">✅ Traiter</button>`:'—'}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:5px">
+        ${p.statut==='en_attente'?`<button class="btn btn-g btn-sm" onclick="majPhoto('${p.id}','traitee')">✅ Traiter</button>`:''}
+        <button class="btn btn-r btn-sm" onclick="deletePhoto('${p.id}')">🗑</button>
+      </div>
+    </td>
   </tr>`).join('');
+}
+async function deletePhoto(id){
+  if(!confirm('Supprimer définitivement cette demande de photocopie ?'))return;
+  try{await api(`/photos/${id}`,'DELETE');toast('Demande supprimée');loadPhotosSrv();}
+  catch(e){toast(e.message,'err');}
 }
 async function majPhoto(id,statut){
   try{await api(`/photos/${id}`,'PUT',{statut});toast('Traité');loadPhotosSrv();loadDashboard();}
@@ -1089,8 +1116,14 @@ async function loadTarifs(){
     <td><span class="bdg ${t.actif?'bdg-g':'bdg-r'}">${t.actif?'Actif':'Inactif'}</span></td>
     <td>
       <button class="btn btn-ghost btn-sm" onclick="toggleTarif('${t.id}',${t.actif})">${t.actif?'Désactiver':'Activer'}</button>
+      <button class="btn btn-r btn-sm" onclick="deleteTarif('${t.id}','${t.libelle.replace(/'/g,"\\'")}')">🗑</button>
     </td>
   </tr>`).join('');
+}
+async function deleteTarif(id,libelle){
+  if(!confirm(`Supprimer définitivement le tarif "${libelle}" ?`))return;
+  try{await api(`/tarifs/${id}`,'DELETE');toast('Tarif supprimé');loadTarifs();}
+  catch(e){toast(e.message,'err');}
 }
 function openTarifModal(){
   editTarifId=null;
@@ -1126,7 +1159,13 @@ async function loadClients(){
     <td class="mono">${c.nb_commandes}</td>
     <td class="mono" style="color:var(--gold-lt)">${c.total_achats.toFixed(2)} DH</td>
     <td class="mono" style="font-size:.72rem">${fmtDt(c.created_at)}</td>
+    <td><button class="btn btn-r btn-sm" onclick="deleteClient('${c.id}','${c.nom.replace(/'/g,"\\'")}')">🗑</button></td>
   </tr>`).join('');
+}
+async function deleteClient(id,nom){
+  if(!confirm(`Supprimer la fiche client "${nom}" ? (son historique de commandes est conservé)`))return;
+  try{await api(`/clients/${id}`,'DELETE');toast('Client supprimé');loadClients();}
+  catch(e){toast(e.message,'err');}
 }
 
 // ── HISTORIQUE ────────────────────────────────────────────────────────

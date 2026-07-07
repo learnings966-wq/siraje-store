@@ -419,6 +419,15 @@ app.put('/api/admin/commandes/:id', (req, res) => {
   res.json(c);
 });
 
+app.delete('/api/admin/commandes/:id', (req, res) => {
+  const idx = DB.commandes.findIndex(x => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  DB.commande_items = DB.commande_items.filter(i => i.commande_id !== req.params.id);
+  DB.commandes.splice(idx, 1);
+  save();
+  res.json({ ok: true });
+});
+
 // ── Produits ───────────────────────────────────────────────────────────
 app.get('/api/admin/produits', (req, res) => {
   const { search, categorie, ecole } = req.query;
@@ -807,6 +816,14 @@ app.post('/api/admin/recharges/vendre', (req, res) => {
   res.status(201).json({ message: 'Vente enregistrée' });
 });
 
+app.delete('/api/admin/recharges/:id', (req, res) => {
+  const idx = DB.demandes_recharge.findIndex(x => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  DB.demandes_recharge.splice(idx, 1);
+  save();
+  res.json({ ok: true });
+});
+
 // ── Photocopies ────────────────────────────────────────────────────────
 app.get('/api/admin/photos', (req, res) => {
   const { statut } = req.query;
@@ -836,6 +853,14 @@ app.post('/api/admin/photos/vendre', (req, res) => {
   DB.ventes_caisse.push({ id: uuidv4(), type:'photocopie', description:`${tarif.libelle} — ${pages} pages`, quantite:+pages, prix_unitaire:tarif.prix_unite, total, operateur:null, reference_id:id, created_at: isoNow() });
   save();
   res.status(201).json({ total, message: 'Vente enregistrée' });
+});
+
+app.delete('/api/admin/photos/:id', (req, res) => {
+  const idx = DB.demandes_photo.findIndex(x => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  DB.demandes_photo.splice(idx, 1);
+  save();
+  res.json({ ok: true });
 });
 
 // ── Paramètres du magasin (adresse, téléphone, horaires) ────────────────
@@ -877,6 +902,14 @@ app.put('/api/admin/tarifs/:id', (req, res) => {
   res.json(t);
 });
 
+app.delete('/api/admin/tarifs/:id', (req, res) => {
+  const idx = DB.tarifs_photo.findIndex(x => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  DB.tarifs_photo.splice(idx, 1);
+  save();
+  res.json({ ok: true });
+});
+
 // ── Clients ────────────────────────────────────────────────────────────
 app.get('/api/admin/clients', (req, res) => {
   res.json(DB.clients.map(c => ({
@@ -884,6 +917,14 @@ app.get('/api/admin/clients', (req, res) => {
     nb_commandes: DB.commandes.filter(x => x.client_id === c.id).length,
     total_achats: DB.commandes.filter(x => x.client_id === c.id && x.statut !== 'annulee').reduce((s,x)=>s+x.total,0)
   })).sort((a,b) => b.created_at.localeCompare(a.created_at)));
+});
+
+app.delete('/api/admin/clients/:id', (req, res) => {
+  const idx = DB.clients.findIndex(x => x.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Non trouvé' });
+  DB.clients.splice(idx, 1);
+  save();
+  res.json({ ok: true });
 });
 
 // ── Historique ─────────────────────────────────────────────────────────
