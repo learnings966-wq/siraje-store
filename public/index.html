@@ -30,13 +30,6 @@
   --inwi:#8b2fc9;
   --orange:#FF6600;
   --green:#16a34a;
-  --leather-1:#8a3d20;
-  --leather-2:#a8471f;
-  --leather-3:#6b3018;
-  --leather-4:#9a5a2e;
-  --leather-5:#c25a2e;
-  --parchment:#e8dcc0;
-  --candle:#ffb15c;
   --r:14px;
   --shadow:0 4px 24px rgba(13,17,28,.1);
 }
@@ -81,69 +74,32 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
 }
 .admin-link:hover{background:var(--gold-lt);}
 
-/* ── HERO — vitrine de bibliothèque antique (3D CSS) ────────────── */
+/* ── HERO ─────────────────────────────────────────────────────── */
 .hero{
-  background:linear-gradient(180deg,var(--night) 0%,var(--navy) 55%,#241608 100%);
+  background:linear-gradient(135deg,var(--night) 0%,var(--navy) 60%,#1a2840 100%);
   padding:100px 5% 80px;display:flex;align-items:center;gap:60px;
   position:relative;overflow:hidden;min-height:560px;
-  perspective:1400px;
 }
 .hero::before{
-  content:'';position:absolute;top:20%;right:-5%;
-  width:800px;height:800px;
-  background:radial-gradient(circle,rgba(255,150,70,.28) 0%,rgba(255,150,70,.08) 45%,transparent 72%);
-  border-radius:50%;pointer-events:none;z-index:1;
+  content:'';position:absolute;top:-100px;right:-100px;
+  width:600px;height:600px;
+  background:radial-gradient(circle,rgba(200,149,42,.15) 0%,transparent 70%);
+  border-radius:50%;
 }
-/* Vignette légère — assombrit juste les bords, laisse la vitrine bien visible au centre */
 .hero::after{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:5;
-  background:radial-gradient(ellipse at 60% 40%,transparent 50%,rgba(10,7,4,.4) 100%);
+  content:'📚';position:absolute;right:8%;bottom:10%;font-size:160px;opacity:.04;
+  animation:float 6s ease-in-out infinite;
 }
-.hero-content{flex:1;max-width:600px;position:relative;z-index:6;}
-/* Voile de lisibilité localisé derrière le texte — laisse la vitrine éclatante ailleurs */
-.hero-content::before{
-  content:'';position:absolute;top:-70px;bottom:-70px;left:-90px;right:-140px;
-  background:linear-gradient(90deg,rgba(8,6,4,.78) 0%,rgba(8,6,4,.55) 55%,transparent 100%);
-  z-index:-1;pointer-events:none;
-}
-.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;}
-
-/* Étagères 3D — rangées de tranches de livres en perspective, façon allée de bibliothèque */
-.hero-shelf{position:absolute;inset:0;z-index:0;transform-style:preserve-3d;pointer-events:none;transition:transform .15s ease-out;}
-.shelf-row{position:absolute;left:-10%;right:-10%;display:flex;align-items:flex-end;gap:3px;transform-style:preserve-3d;}
-.shelf-row .book{
-  flex:0 0 auto;border-radius:2px 2px 0 0;
-  box-shadow:inset -4px 0 8px rgba(0,0,0,.4),inset 2px 0 0 rgba(255,255,255,.1),1px 0 0 rgba(255,177,92,.35);
-  position:relative;
-}
-.shelf-row .book::after{
-  content:'';position:absolute;top:14%;left:0;right:0;height:3px;background:rgba(255,205,140,.55);
-}
-.shelf-board{position:absolute;left:-10%;right:-10%;bottom:-6px;height:10px;
-  background:linear-gradient(180deg,#4a2c17,#1c1108);box-shadow:0 6px 16px rgba(0,0,0,.5),0 -1px 0 rgba(255,177,92,.25);}
-
-/* Poussière en suspension, éclairée par la lumière de la vitrine */
-.hero-dust{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
-.dust-mote{position:absolute;width:5px;height:5px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,220,160,1),transparent 70%);
-  box-shadow:0 0 6px 1px rgba(255,190,110,.8);
-  animation:dustFloat linear infinite;opacity:0;}
-@keyframes dustFloat{
-  0%{opacity:0;transform:translate(0,0);}
-  15%{opacity:.95;}
-  85%{opacity:.7;}
-  100%{opacity:0;transform:translate(var(--dx,40px),-220px);}
-}
-
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+.hero-content{flex:1;max-width:600px;position:relative;z-index:2;}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;}
 .hero-badge{
-  display:inline-flex;align-items:center;gap:10px;
-  background:linear-gradient(180deg,rgba(232,220,192,.08),rgba(232,220,192,.02));
-  border:1px solid rgba(232,220,192,.35);
-  color:var(--parchment);padding:7px 16px 7px 14px;border-radius:2px;
-  font-family:'Fraunces',serif;font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
-  margin-bottom:22px;position:relative;
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(200,149,42,.15);border:1px solid rgba(200,149,42,.3);
+  color:var(--gold-lt);padding:5px 14px;border-radius:20px;
+  font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  margin-bottom:20px;
 }
-.hero-badge::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:rgba(255,177,92,.5);}
 
 .hero h1{
   font-family:'Fraunces',serif;font-size:clamp(2.2rem,5vw,3.6rem);
@@ -164,12 +120,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
   cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:.2s;
 }
 .btn-hero-sec:hover{background:rgba(255,255,255,.12);}
-.hero-stats{
-  display:flex;gap:32px;margin-top:40px;padding:24px 20px 20px;
-  border-top:1px solid rgba(255,177,92,.25);border-bottom:1px solid rgba(255,177,92,.12);
-  position:relative;
-}
-.hero-stats::before{content:'';position:absolute;top:-1px;left:0;width:60px;height:1px;background:var(--candle);}
+.hero-stats{display:flex;gap:32px;margin-top:40px;padding-top:32px;border-top:1px solid rgba(255,255,255,.08);}
 .hero-stat .num{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:700;color:var(--gold-lt);}
 .hero-stat .lbl{font-size:.75rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.06em;}
 .hero-stat-game{cursor:default;}
@@ -510,7 +461,7 @@ footer{
 /* ── RESPONSIVE ───────────────────────────────────────────────── */
 @media(max-width:768px){
   .nav-links{display:none}
-  .hero{flex-direction:column;padding:60px 5%;perspective:800px;}
+  .hero{flex-direction:column;padding:60px 5%;}
   .hero-stats{flex-wrap:wrap;gap:16px;}
   .photo-layout{grid-template-columns:1fr;}
   .footer-grid{grid-template-columns:1fr;}
@@ -542,11 +493,9 @@ footer{
 
 <!-- ════ HERO ══════════════════════════════════════════════════════════ -->
 <section class="hero" id="top">
-  <div class="hero-shelf" id="hero-shelf" aria-hidden="true"></div>
-  <div class="hero-dust" id="hero-dust" aria-hidden="true"></div>
   <canvas class="hero-canvas" id="supplies-canvas" aria-hidden="true"></canvas>
   <div class="hero-content">
-    <div class="hero-badge">Collection permanente — Fournitures & Manuels</div>
+    <div class="hero-badge">✨ Votre store de confiance</div>
     <h1>Livres scolaires,<br><em>recharges</em> et<br>photocopie</h1>
     <p>Tout ce dont vous avez besoin pour l'école et le quotidien — commandez en ligne, récupérez en magasin.</p>
     <div class="hero-ctas">
@@ -1592,77 +1541,6 @@ function fiReinitialiser(){
     if (observer) observer.observe(heroEl);
     lastTime = performance.now();
     rafId = requestAnimationFrame(loop);
-  }
-})();
-</script>
-<script>
-// ── Vitrine 3D de bibliothèque antique (décor du hero) ──────────────────
-(function(){
-  const shelfEl = document.getElementById('hero-shelf');
-  const dustEl  = document.getElementById('hero-dust');
-  const heroEl  = document.querySelector('.hero');
-  if (!shelfEl || !dustEl || !heroEl) return;
-
-  const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-  const isNarrow = window.innerWidth < 640;
-  const densite = isNarrow ? 0.55 : 1;
-  const leatherTones = ['var(--leather-1)','var(--leather-2)','var(--leather-3)','var(--leather-4)','var(--leather-5)'];
-
-  // 3 rangées de tranches de livres, reculant en profondeur (rotateX + translateZ + échelle)
-  const rows = [
-    { count: Math.round(26*densite), height: 150, y: '4%',  depth: -60,  scale: .78, opacity: .58 },
-    { count: Math.round(22*densite), height: 190, y: '34%', depth: 40,   scale: .92, opacity: .78 },
-    { count: Math.round(18*densite), height: 230, y: '66%', depth: 140,  scale: 1.08, opacity: .96 }
-  ];
-
-  rows.forEach((row, ri) => {
-    const shelfRow = document.createElement('div');
-    shelfRow.className = 'shelf-row';
-    shelfRow.style.top = row.y;
-    shelfRow.style.transform = `translateZ(${row.depth}px) scale(${row.scale})`;
-    shelfRow.style.opacity = row.opacity;
-    for (let i = 0; i < row.count; i++) {
-      const book = document.createElement('div');
-      book.className = 'book';
-      const h = row.height * (0.55 + Math.random()*0.45);
-      const w = 14 + Math.random()*16;
-      book.style.height = h + 'px';
-      book.style.width = w + 'px';
-      book.style.background = leatherTones[Math.floor(Math.random()*leatherTones.length)];
-      shelfRow.appendChild(book);
-    }
-    const board = document.createElement('div');
-    board.className = 'shelf-board';
-    board.style.top = `calc(${row.y} + ${row.height}px)`;
-    board.style.transform = `translateZ(${row.depth}px) scale(${row.scale})`;
-    shelfEl.appendChild(shelfRow);
-    shelfEl.appendChild(board);
-  });
-
-  // Poussière en suspension (quelques particules, désactivées si mouvement réduit demandé)
-  if (!reduceMotion) {
-    for (let i = 0; i < 35; i++) {
-      const mote = document.createElement('div');
-      mote.className = 'dust-mote';
-      mote.style.left = Math.random()*100 + '%';
-      mote.style.bottom = (Math.random()*55) + '%';
-      mote.style.setProperty('--dx', (Math.random()*80-40) + 'px');
-      mote.style.animationDuration = (6 + Math.random()*8) + 's';
-      mote.style.animationDelay = (Math.random()*8) + 's';
-      dustEl.appendChild(mote);
-    }
-  }
-
-  // Parallaxe légère au mouvement de la souris (desktop uniquement, respecte le mouvement réduit)
-  if (!reduceMotion && !isTouch) {
-    heroEl.addEventListener('mousemove', (e) => {
-      const rect = heroEl.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width - 0.5;
-      const py = (e.clientY - rect.top) / rect.height - 0.5;
-      shelfEl.style.transform = `rotateY(${px*14}deg) rotateX(${-py*10}deg)`;
-    });
-    heroEl.addEventListener('mouseleave', () => { shelfEl.style.transform = 'rotateY(0) rotateX(0)'; });
   }
 })();
 </script>
