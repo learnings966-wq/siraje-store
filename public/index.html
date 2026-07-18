@@ -109,7 +109,7 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
 .hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;}
 
 /* Étagères 3D — rangées de tranches de livres en perspective, façon allée de bibliothèque */
-.hero-shelf{position:absolute;inset:0;z-index:0;transform-style:preserve-3d;pointer-events:none;transition:transform .3s ease-out;}
+.hero-shelf{position:absolute;inset:0;z-index:0;transform-style:preserve-3d;pointer-events:none;transition:transform .15s ease-out;}
 .shelf-row{position:absolute;left:-10%;right:-10%;display:flex;align-items:flex-end;gap:3px;transform-style:preserve-3d;}
 .shelf-row .book{
   flex:0 0 auto;border-radius:2px 2px 0 0;
@@ -124,14 +124,15 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--cream);color:va
 
 /* Poussière en suspension, éclairée par la lumière de la vitrine */
 .hero-dust{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden;}
-.dust-mote{position:absolute;width:3px;height:3px;border-radius:50%;
-  background:radial-gradient(circle,rgba(255,205,140,.9),transparent 70%);
+.dust-mote{position:absolute;width:5px;height:5px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,220,160,1),transparent 70%);
+  box-shadow:0 0 6px 1px rgba(255,190,110,.8);
   animation:dustFloat linear infinite;opacity:0;}
 @keyframes dustFloat{
   0%{opacity:0;transform:translate(0,0);}
-  10%{opacity:.7;}
-  90%{opacity:.5;}
-  100%{opacity:0;transform:translate(var(--dx,40px),-160px);}
+  15%{opacity:.95;}
+  85%{opacity:.7;}
+  100%{opacity:0;transform:translate(var(--dx,40px),-220px);}
 }
 
 .hero-badge{
@@ -1641,14 +1642,14 @@ function fiReinitialiser(){
 
   // Poussière en suspension (quelques particules, désactivées si mouvement réduit demandé)
   if (!reduceMotion) {
-    for (let i = 0; i < 18; i++) {
+    for (let i = 0; i < 35; i++) {
       const mote = document.createElement('div');
       mote.className = 'dust-mote';
       mote.style.left = Math.random()*100 + '%';
-      mote.style.bottom = (Math.random()*40) + '%';
-      mote.style.setProperty('--dx', (Math.random()*60-30) + 'px');
-      mote.style.animationDuration = (8 + Math.random()*10) + 's';
-      mote.style.animationDelay = (Math.random()*10) + 's';
+      mote.style.bottom = (Math.random()*55) + '%';
+      mote.style.setProperty('--dx', (Math.random()*80-40) + 'px');
+      mote.style.animationDuration = (6 + Math.random()*8) + 's';
+      mote.style.animationDelay = (Math.random()*8) + 's';
       dustEl.appendChild(mote);
     }
   }
@@ -1659,7 +1660,7 @@ function fiReinitialiser(){
       const rect = heroEl.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      shelfEl.style.transform = `rotateY(${px*4}deg) rotateX(${-py*3}deg)`;
+      shelfEl.style.transform = `rotateY(${px*14}deg) rotateX(${-py*10}deg)`;
     });
     heroEl.addEventListener('mouseleave', () => { shelfEl.style.transform = 'rotateY(0) rotateX(0)'; });
   }
